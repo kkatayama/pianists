@@ -24,7 +24,7 @@ sudo apt-get install git
 ### 0.b Clone this Repo
 
 ``` bash
-git clone https://github.com/kkatayama/m2band.git
+git clone https://github.com/kkatayama/pianists.git
 ```
 
 ## 1. Python
@@ -78,7 +78,7 @@ sqlite3 m2band.db
 ### 1.b Create Tables
 ``` sql
 CREATE TABLE users (user_id INTEGER PRIMARY KEY AUTOINCREMENT, username TEXT NOT NULL, password TEXT NOT NULL, create_time TIMESTAMP NOT NULL);
-CREATE TABLE oximeter (entry_id INTEGER PRIMARY KEY AUTOINCREMENT, user_id INTEGER NOT NULL, heart_rate INTEGER, blood_o2 INTEGER, temperature DOUBLE, entry_time TIMESTAMP);
+CREATE TABLE files (entry_id INTEGER PRIMARY KEY AUTOINCREMENT, user_id INTEGER NOT NULL, file_name TEXT NOT NULL, entry_time TIMESTAMP);
 ```
 
 ## 2. App
@@ -86,147 +86,141 @@ CREATE TABLE oximeter (entry_id INTEGER PRIMARY KEY AUTOINCREMENT, user_id INTEG
 ### 2.a Run App
 
 ``` bash
-python3 server.py 8080
+python3 server.py
 ```
 
 
 ### 2.b Testing
 
-Make a `GET` request to [http://raspberry-pi-ip-address:8080/](http://raspberry-pi-ip-address:8080/)
+Make a `GET` request to [http://raspberry-pi-ip-address:8080/commands](http://raspberry-pi-ip-address:8080/commands)
 
 ``` json
 {
-    "message": "available commands",
-    "GET": [
-        {
-            "/": {
-                "Note": "debug function",
-                "Returns": "this list of available commands"
-            }
-        },
-        {
-            "/getUsers": {
-                "Note": "debug function",
-                "Returns": "list of users in the 'users' table"
-            }
-        },
-        {
-            "/getAllSensorData": {
-                "Note": "debug function",
-                "Returns": "Sensor data for all users"
-            }
-        }
-    ],
-    "POST": [
-        {
-            "/login": {
-                "Params": [
-                    "username",
-                    "password"
-                ],
-                "Returns": [
-                    {
-                        "message": "user does not exist",
-                        "username": "username"
-                    },
-                    {
-                        "message": "incorrect password",
-                        "password": "password"
-                    },
-                    {
-                        "message": "user login success",
-                        "user_id": "user_id",
-                        "username": "username"
-                    }
-                ]
-            },
-            "/createUser": {
-                "Params": [
-                    "username",
-                    "password"
-                ],
-                "Returns": [
-                    {
-                        "message": "user exists",
-                        "username": "username"
-                    },
-                    {
-                        "message": "user created",
-                        "user_id": "user_id",
-                        "username": "username"
-                    }
-                ]
-            },
-            "/getUser": {
-                "Params": [
-                    "user_id"
-                ],
-                "Returns": [
-                    {
-                        "message": "user account details",
-                        "data": "json object of user info for 'user_id'"
-                    }
-                ]
-            },
-            "/addSensorData": {
-                "Params": [
-                    "user_id",
-                    "heart_rate",
-                    "blood_o2",
-                    "temperature"
-                ],
-                "Returns": [
-                    {
-                        "message": "sensor data added for 'user_id'",
-                        "user_id": "user_id",
-                        "row_id": "row_id"
-                    }
-                ]
-            },
-            "/getSensorData": {
-                "Params": [
-                    "user_id"
-                ],
-                "Returns": [
-                    {
-                        "message": "sensor data for 'user_id'",
-                        "data": "list of sensor data for 'user_id'"
-                    }
-                ]
-            }
-        }
-    ],
-    "POST|PUT": [
-        {
-            "/editUser": {
-                "Params": [
-                    "user_id",
-                    "username AND/OR password"
-                ],
-                "Returns": [
-                    {
-                        "message": "user edited",
-                        "user_id": "user_id"
-                    }
-                ]
-            }
-        }
-    ],
-    "POST|DELETE": [
-        {
-            "/deleteUser": {
-                "Params": [
-                    "user_id"
-                ],
-                "Returns": [
-                    {
-                        "message": "user deleted",
-                        "user_id": "user_id"
-                    }
-                ]
-            }
-        }
-    ]
+  "message": "available commands",
+  "GET": [
+    {
+      "/commands": {
+        "Note": "debug function",
+        "Returns": "this list of available commands"
+      }
+    },
+    {
+      "/": {
+        "Note": "index",
+        "Returns": "login page"
+      }
+    },
+    {
+      "/login": {
+        "Note": "login",
+        "Returns": "login page"
+      }
+    },
+    {
+      "/register": {
+        "Note": "add a user",
+        "Returns": "user registration page"
+      }
+    },
+    {
+      "/logout": {
+        "Note": "log a user out",
+        "Returns": "login page"
+      }
+    },
+    {
+      "/dashboard": {
+        "Note": "page for logged in users",
+        "Returns": "user dashboard"
+      }
+    },
+    {
+      "/uploadFile": {
+        "Note": "only pdf files accepted",
+        "Returns": "upload file page"
+      }
+    }
+  ],
+  "POST": [
+    {
+      "/login": {
+        "Params": [
+          "username",
+          "password",
+          "password2"
+        ],
+        "Returns": [
+          {
+            "message": "missing parameter"
+          },
+          {
+            "message": "user does not exist",
+            "username": "username"
+          },
+          {
+            "message": "incorrect password",
+            "password": "password"
+          },
+          {
+            "message": "user login success",
+            "user_id": "user_id",
+            "username": "username"
+          }
+        ]
+      }
+    },
+    {
+      "/uploadFile": {
+        "Params": [
+          "user_id",
+          "upload"
+        ],
+        "Returns": [
+          {
+            "message": "file extension (ext) is not allowed"
+          },
+          {
+            "message": "file exists!"
+          },
+          {
+            "message": "file uploaded"
+          }
+        ]
+      }
+    },
+    {
+      "/deleteFile": {
+        "Params": [
+          "user_id",
+          "entry_id"
+        ],
+        "Returns": [
+          {
+            "message": "no file with matching 'entry_id' and 'user_id'"
+          },
+          {
+            "message": "(num_deletes) files deleted"
+          }
+        ]
+      }
+    },
+    {
+      "/processFile": {
+        "Params": [
+          "user_id",
+          "entry_id"
+        ],
+        "Returns": [
+          {
+            "message": "no file with matching 'entry_id' and 'user_id'"
+          },
+          {
+            "message": "processing file"
+          }
+        ]
+      }
+    }
+  ]
 }
 ```
 
