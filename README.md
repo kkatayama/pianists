@@ -72,7 +72,7 @@ These database steps are only needed if you did not do step `0.b`
 ### 1.a Create Database
 
 ``` bash
-sqlite3 m2band.db
+sqlite3 pianists.db
 ```
 
 ### 1.b Create Tables
