@@ -20,7 +20,7 @@ app.install(plugin)
 @app.route("/commands", method=["GET", "POST", "PUT", "DELETE", "OPTIONS"])
 def commands():
     with open('all_commands.json') as f:
-        res = f.load(f)
+        res = json.load(f)
     print(res)
     return res
 
