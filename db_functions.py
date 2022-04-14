@@ -17,8 +17,10 @@ All functions support a full SQL [query] or a python [dict]
 """
 import hashlib
 import codecs
+import sqlite3
 import json
 import os
+import re
 
 
 ###############################################################################
@@ -309,3 +311,63 @@ def checkPassword(plaintext, hex_pass):
 
 def clean(data):
     return json.loads(json.dumps(data, default=str))
+
+def mapUrlPaths(url_paths, req_items, table=""):
+    # dt = "DATETIME NOT NULL DEFAULT (strftime('%Y-%m-%d %H:%M:%f', 'now', 'localtime'))"
+    dt = "NOT NULL DEFAULT (strftime('%Y-%m-%d %H:%M:%f', 'now', 'localtime'))"
+    r = re.compile(r"/", re.VERBOSE)
+    keys = map(str.lower, r.split(url_paths)[::2])
+    vals = map(str.upper, r.split(url_paths)[1::2])
+    url_params = dict(zip(keys, vals))
+
+    # -- process params
+    req_params = {k.lower():v.upper() for (k,v) in req_items.items()}
+    params = {**url_params, **req_params}
+
+    # -- order and build columns for CREATE statement
+    id_cols, time_cols, non_cols, rejects = ([] for i in range(4))
+    for (k, v) in params.items():
+        if re.match(r"([a-z_0-9]+_id)", k):
+            if (table == "users") or ("user" not in k):
+                id_cols.insert(0, f"{k} {v} PRIMARY KEY")
+            else:
+                id_cols.append(f"{k} {v} NOT NULL")
+        elif re.match(r"([a-z_0-9]+_time)", k):
+            time_cols.append(f"{k} {v} {dt}")
+        elif re.match(r"([a-z_0-9]+)", k):
+            non_cols.append(f"{k} {v} NOT NULL")
+        else:
+            reject.append({k: v})
+
+    columns = id_cols + non_cols + time_cols
+    print(f'params = {params}')
+    print(f'columns = {columns}')
+    return params, columns
+
+def addTable(db, query="", **kwargs):
+    if not query:
+        # table = kwargs.get("table")
+        table = kwargs["table"]["name"] if isinstance(kwargs.get("table"), dict) else kwargs.get("table")
+        columns = kwargs.get("columns")
+        query = f'CREATE TABLE {table} ({", ".join(columns)});'
+    print(query)
+    try:
+        cur = db.execute(query)
+    except (sqlite3.ProgrammingError, sqlite3.OperationalError) as e:
+        print(e.args)
+        return {"Error": e.args, "query": query, "values": values, "kwargs": kwargs}
+    return {"message": f"{abs(cur.rowcount)} table created", "table": table, "columns": columns}
+
+def deleteTable(db, query="", **kwargs):
+    if not query:
+        # table = kwargs.get("table")
+        table = kwargs["table"]["name"] if isinstance(kwargs.get("table"), dict) else kwargs.get("table")
+        query = f"DROP TABLE {table};"
+    print(query)
+
+    try:
+        cur = db.execute(query)
+    except (sqlite3.ProgrammingError, sqlite3.OperationalError) as e:
+        print(e.args)
+        return {"Error": e.args, "query": query, "values": values, "kwargs": kwargs}
+    return {"message": f"{abs(cur.rowcount)} table deleted!"}
