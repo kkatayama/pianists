@@ -1,4 +1,11 @@
 # coding: utf-8
+# %load Migrate_Tables_to_New_Format.py
+# %load Migrate_Tables_to_New_Format.py
+from pathlib import Path
+import sys
+
+sys.path.append(str(Path(".").absolute().parent))
+
 from rich import print
 from db_functions import *
 import sqlite3
@@ -27,47 +34,47 @@ def dropTable(db, table):
 
 
 if __name__ == "__main__":
-    db = sqlite3.connect("pianists.db")
+    db = sqlite3.connect("../pianists.db")
     db.text_factory = str
     db.row_factory = sqlite3.Row
 
     # -- store existing table data
-    users = get(db, table="users")
+    # users = get(db, table="users")
     files = get(db, table="files")
     print("EXISTING TABLES:")
-    print(f'"users" = {users}')
+    # print(f'"users" = {users}')
     print(f'"files" = {files}')
     print()
 
     # -- delete existing tables
     print("DELETE TABLES:")
-    dropTable(db, table="users")
+    # dropTable(db, table="users")
     dropTable(db, table="files")
     print()
 
     # -- create tables
     print("CREATE TABLES:")
-    createTable(
-        db,
-        table="users",
-        url_paths="user_id/INTEGER/username/TEXT/password/TEXT/create_time/DATETIME",
-    )
+    # createTable(
+    #    db,
+    #    table="users",
+    #    url_paths="user_id/INTEGER/username/TEXT/password/TEXT/create_time/DATETIME",
+    # )
     createTable(
         db,
         table="files",
-        url_paths="entry_id/INTEGER/user_id/INTEGER/file_name/TEXT/entry_time/DATETIME",
+        url_paths="entry_id/INTEGER/user_id/INTEGER/title/TEXT/level/TEXT/category/TEXT/file_name/TEXT/entry_time/DATETIME",
     )
     print()
 
     # -- insert data to tables:
     print("INSERT DATA:")
-    for user in users:
-        required = ["username", "password"]
-        entry = {k: user[k] for k in required}
-        columns, col_values = list(entry.keys()), list(entry.values())
-        add(db, table="users", columns=columns, col_values=col_values)
+    # for user in users:
+    #    required = ["username", "password"]
+    #    entry = {k: user[k] for k in required}
+    #    columns, col_values = list(entry.keys()), list(entry.values())
+    #    add(db, table="users", columns=columns, col_values=col_values)
     for file in files:
-        required = ["user_id", "file_name"]
+        required = ["user_id", "title", "file_name"]
         entry = {k: file[k] for k in required}
         columns, col_values = list(entry.keys()), list(entry.values())
         add(db, table="files", columns=columns, col_values=col_values)

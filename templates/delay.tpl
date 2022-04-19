@@ -23,7 +23,7 @@
     </div>
     <script>
     % if defined('location'):
-      setTimeout(function () { window.location.href="{{location}}" }, 5000);
+      setTimeout(function () { window.location.href="{{location}}" }, 3500);
     % end
     </script>
   </body>

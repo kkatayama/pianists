@@ -1,12 +1,15 @@
 from bottle import Bottle, request, response, run, template, static_file, redirect
 from bottle_sqlite import SQLitePlugin, sqlite3
+from itertools import chain
 from db_functions import *
 from datetime import datetime
 from pathlib import Path
 from hashlib import sha256
 from secret import key
+from rich import print
 # from rich.traceback import install
 # from rich import print, inspect, print_json, pretty
+import shutil
 import json
 import sys
 import os
@@ -294,6 +297,88 @@ def processFile(db):
     }
     print(res)
     return template("templates/delay.tpl", res=res, location="/dashboard")
+
+@app.route("/search", method=["GET", "POST"])
+def search(db):
+    print(f'params = {request.params}')
+    if not request.get_cookie("user_id", secret=key):
+        redirect('/')
+    if not request.params:
+        return template("templates/search.tpl",
+                        user_values={}, levels=getLevels(db), categories=getCategories(db))
+
+    user_id = str(request.get_cookie("user_id", secret=key))
+    query = {}
+    user_values = {}
+    if request.params.get("title"):
+        query.update({"title LIKE ?": ["%" + request.params["title"] + "%"]})
+        user_values["title"] = request.params["title"]
+    for term in {"level", "category"}:
+        items = {k: v for k, v in request.params.items() if term in k}
+        if items:
+            item_key = " OR ".join([f"{term} = ?" for k in items.keys()])
+            item_value = list(items.values())
+            query.update({f"({item_key})": item_value})
+            user_values[term] = list(items.keys())
+    conditions = " AND ".join(query)
+    values = list(chain(*query.values()))
+
+    rows = fetchRows(db, table="mmf", where=conditions, values=values)
+    if not rows:
+        rows = {}
+    print(rows)
+    return template("templates/search.tpl",
+                    user_values=user_values, query=query,
+                    levels=getLevels(db), categories=getCategories(db), rows=rows)
+
+@app.route("/downloadFile", method=["GET", "POST"])
+def downloadFile(db):
+    if not request.get_cookie("user_id", secret=key):
+        redirect('/')
+    if not request.params.get("entry_id"):
+        return template("templates/delay.tpl", res={"message": "missing 'entry_id'"}, location="/dashboard")
+    user_id = str(request.get_cookie("user_id", secret=key))
+    mmf_entry_id = str(request.params.get("entry_id"))
+    mmf_file = fetchRow(db, table="mmf", where="entry_id = ?", values=[mmf_entry_id])
+    print(f"mmf_file = {mmf_file}")
+
+    # -- check if file exists
+    title = mmf_file["title"]
+    level = mmf_file["level"]
+    category = mmf_file["category"]
+    file_name = Path(mmf_file["pdf_file"]).name
+    entry_time = datetime.now()
+    user_dir = Path(Path.cwd(), "pdf_files", user_id)
+    Path.mkdir(user_dir, exist_ok=True)
+    if user_dir.joinpath(file_name).exists():
+        res = {
+            "message": "file exists!",
+            "title": title,
+            "file": user_dir.joinpath(file_name)
+        }
+        return template("templates/delay.tpl", res=clean(res), location="/dashboard")
+
+    # -- download (copy) file
+    src_file = str(Path(Path.cwd(), "making_music_fun", mmf_file["pdf_file"]))
+    dst_file = str(Path(user_dir, file_name))
+    print("### COPY ###")
+    print(f'src_file = "{src_file}"')
+    print(f'dst_file = "{dst_file}"')
+    shutil.copy(src_file, dst_file)
+    params = {
+        "table": "files",
+        "columns": ["user_id", "title", "file_name", "level", "category", "entry_time"],
+        "col_values": [user_id, title, file_name, level, category, entry_time]
+    }
+    entry_id = insertRow(db, **params)
+
+    res = {
+        "message": "file downloaded",
+        "entry_id": entry_id
+    }
+    print(res)
+    return template("templates/delay.tpl", res=res, location="/dashboard")
+    # redirect("/dashboard")
 
 
 ###############################################################################

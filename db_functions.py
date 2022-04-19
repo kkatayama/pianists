@@ -15,6 +15,7 @@ All functions support a full SQL [query] or a python [dict]
 # -- checkPassword()    - check if password matches
 # -- clean()            - sanitize data for json delivery
 """
+from bottle import request, response, FormsDict, template
 import hashlib
 import codecs
 import sqlite3
@@ -114,7 +115,7 @@ def fetchRow(db, query="", **kwargs):
     else:
         table     = kwargs.get("table")
         columns   = "*" if not kwargs.get("columns") else ",".join(kwargs["columns"])
-        condition = "1" if not kwargs.get("where") else f'({kwargs["where"]})'
+        condition = "1" if not kwargs.get("where") else f'{kwargs["where"]}'
         values    = [kwargs.get("values")] if isinstance(kwargs.get("values"), str) else kwargs.get("values")
         query = f"SELECT {columns} FROM {table} WHERE {condition};"
     print(query)
@@ -164,7 +165,7 @@ def fetchRows(db, query="", **kwargs):
     else:
         table     = kwargs.get("table")
         columns   = "*" if not kwargs.get("columns") else ",".join(kwargs["columns"])
-        condition = "1" if not kwargs.get("where") else f'({kwargs["where"]})'
+        condition = "1" if not kwargs.get("where") else f'{kwargs["where"]}'
         values    = [kwargs.get("values")] if isinstance(kwargs.get("values"), str) else kwargs.get("values")
         query = f"SELECT {columns} FROM {table} WHERE {condition};"
     print(query)
@@ -340,9 +341,47 @@ def mapUrlPaths(url_paths, req_items, table=""):
             reject.append({k: v})
 
     columns = id_cols + non_cols + time_cols
-    print(f'params = {params}')
-    print(f'columns = {columns}')
+    print("__params__\n", params, "\n__columns__\n", columns)
     return params, columns
+
+def parseURI(url_paths):
+    # print(f'url_paths = {url_paths}')
+    r = re.compile(r"/", re.VERBOSE)
+    url_split = r.split(url_paths)
+
+    if (len(url_split) % 2) == 0:
+        p = map(str, url_split)
+        url_params = dict(zip(p, p))
+    elif url_paths:
+        keys, values = ([] for i in range(2))
+        for i in range(0, len(url_split), 2):
+            if re.match(r"([a-z_]+)", url_split[i]):
+                keys.append(url_split[i])
+                values.append(url_split[i + 1])
+            else:
+                values[-1] = "/".join([values[-1], url_split[i]])
+        url_params = dict(zip(keys, values))
+    else:
+        url_params = {}
+
+    return url_params
+
+def parseUrlPaths(url_paths, req_items, columns, checkFilters=False):
+    # -- parse "params" and "filters" from url paths
+    url_params = parseURI(url_paths)
+
+    if checkFilters:
+        # -- process filters (pop from url_params if necessary)
+        url_filters = url_params.pop("filter") if url_params.get("filter") else ""
+        req_filters = req_items["filter"] if req_items.get("filter") else ""
+        filters = " AND ".join([f for f in [url_filters, req_filters] if f])
+    # -- process params
+    req_params = {k:v for (k,v) in req_items.items() if k in columns}
+    params = {**url_params, **req_params}
+
+    if checkFilters:
+        return params, filters
+    return params
 
 def addTable(db, query="", **kwargs):
     if not query:
@@ -355,7 +394,7 @@ def addTable(db, query="", **kwargs):
         cur = db.execute(query)
     except (sqlite3.ProgrammingError, sqlite3.OperationalError) as e:
         print(e.args)
-        return {"Error": e.args, "query": query, "values": values, "kwargs": kwargs}
+        return {"Error": e.args, "query": query, "columns": columns, "kwargs": kwargs}
     return {"message": f"{abs(cur.rowcount)} table created", "table": table, "columns": columns}
 
 def deleteTable(db, query="", **kwargs):
@@ -371,3 +410,100 @@ def deleteTable(db, query="", **kwargs):
         print(e.args)
         return {"Error": e.args, "query": query, "values": values, "kwargs": kwargs}
     return {"message": f"{abs(cur.rowcount)} table deleted!"}
+
+def getTable(db, tables=[], table_name=''):
+    if not tables:
+        tables = getTables(db)
+    # table = next((filter(lambda t: t["name"] == table_name, tables)), None)
+    table = dict(*filter(lambda t: t["name"] == table_name, tables))
+    if table:
+        table["columns"] = {c["name"]: c["type"].split()[0] for c in table["columns"]}
+    return table
+
+def getTables(db):
+    args = {
+        "table": 'sqlite_schema',
+        # "columns": ["name", "type", "sql"],
+        "columns": ["name", "type"],
+        "where": "type = ? AND name NOT LIKE ?",
+        "values": ['table', 'sqlite_%']
+    }
+    tables = fetchRows(db, **args)
+    for table in tables:
+        table["columns"] = getColumns(db, table)
+
+    return tables
+
+def getColumns(db, table, required=False, editable=False, non_editable=False, ref=False):
+    if not table.get("columns"):
+        query = f'PRAGMA table_info({table["name"]});'
+        rows = db.execute(query).fetchall()
+        col_info = []
+        for row in [dict(row) for row in rows]:
+            dflt = row["dflt_value"]
+            info = {"name": row["name"], "type": f'{row["type"]} {"PRIMARY KEY" if row["pk"] else ""}'}
+            info["type"] += f'{"NOT NULL"}' if row["notnull"] else ""
+            info["type"] += f" DEFAULT ({dflt})" if dflt else ""
+            col_info.append(info)
+        return col_info
+
+    regex = r"(_id|_time)" if table["name"] == "users" else r"((?<!user)_id|_time)"
+    editable_columns = {key: table["columns"][key] for key in table["columns"] if not re.search(regex, key)}
+    non_editable_columns = {key: table["columns"][key] for key in table["columns"] if re.search(regex, key)}
+
+    if required or editable:
+        return editable_columns
+    if non_editable:
+        return non_editable_columns
+    if ref:
+        return re.search(r"(.*_id)", " ".join(non_editable_columns)).group()
+    return table["columns"]
+
+def getLevels(db):
+    args = {
+        "table": 'mmf',
+        "columns": ["level"],
+        "where": "? GROUP BY level",
+        "values": ['1']
+    }
+    return fetchRows(db, **args)
+
+def getCategories(db):
+    args = {
+        "table": 'mmf',
+        "columns": ["category"],
+        "where": "? GROUP BY category",
+        "values": ['1']
+    }
+    return fetchRows(db, **args)
+
+def clean(data):
+    # user_agent = request.environ["HTTP_USER_AGENT"] if request.environ.get("HTTP_USER_AGENT") else ""
+    # browser_agents = [
+    #     "Mozilla",
+    #     "Firefox",
+    #     "Seamonkey",
+    #     "Chrome",
+    #     "Chromium",
+    #     "Safari",
+    #     "OPR",
+    #     "Opera",
+    #     "MSIE",
+    #     "Trident",
+    # ]
+    # print(f'user_agent = {user_agent}')
+    # regex = r"({})".format("|".join(browser_agents))
+
+    if isinstance(data, dict):
+        for k, v in data.items():
+            if isinstance(v, FormsDict):
+                data.update({k: dict(v)})
+
+    str_data = json.dumps(data, default=str, indent=2)
+    # if re.search(regex, user_agent):
+    #     print(str_data)
+    #     return template("templates/prettify.tpl", data=str_data)
+
+    cleaned = json.loads(str_data)
+    print(cleaned)
+    return cleaned

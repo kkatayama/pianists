@@ -6,53 +6,48 @@
   </head>
 
   <body>
-    <div class="center">
-      <form method="post">
-        <div class="divTable blueTable">
-          <div class="divTableHeading">
-            <div class="divTableRow">
-              <div class="divTableHead"></div>
-              <div class="divTableHead">ID</div>
-              <div class="divTableHead">FILE NAME</div>
-              <div class="divTableHead">DATE</div>
-            </div>
-          </div>
-          <div class="divTableBody">
-            % if defined('rows'):
-              % for row in rows:
-                <div class="divTableRow">
-                  <div class="divTableCell">
-                    <input type="radio" name="entry_id" value="{{row['entry_id']}}" checked />
-                  </div>
-                  <div class="divTableCell">{{row["entry_id"]}}</div>
-                  <div class="divTableCell">{{row["file_name"]}}</div>
-                  <div class="divTableCell">{{row["entry_time"]}}</div>
-                </div>
+    <div class="outer">
+      <div class="top">
+        <form method="post">
+          <div class="banner">User Dashboard</div>
+          <table class="greenTable" id="results">
+            <thead>
+              <tr>
+                <th></th>
+                <th>ID</th>
+                <th>Title</th>
+                <th>File Name</th>
+                <th>Level</th>
+                <th>Category</th>
+                <th>Date Downloaded</th>
+              </tr>
+            </thead>
+            <tbody>
+              % if defined('rows'):
+                % for row in rows:
+                  <tr>
+                    <td>
+                      <input type="radio" name="entry_id" value="{{row['entry_id']}}" checked />
+                    </td>
+                    <td>{{row["entry_id"]}}</td>
+                    <td>{{row["title"]}}</td>
+                    <td>{{row["file_name"]}}</td>
+                    <td>{{row["level"]}}</td>
+                    <td>{{row["category"]}}</td>
+                    <td>{{row["entry_time"]}}</td>
+                  </tr>
+                % end
               % end
-            % end
-          </div>
-          <div class="divTableFoot tableFootStyle">
-            <div class="divTableRow">
-              <div class="divTableCell">
-                <input type="submit" formaction="/deleteFile" value="Delete" />
-              </div>
-              <div class="divTableCell">
-                <a href="/uploadFile">
-                  Upload File
-                </a>
-              </div>
-              <div class="divTableCell">
-                <input type="submit" formaction="/processFile" value="Process File" />
-              </div>
-              <div class="divTableCell">
-                <a href="/logout">
-                  Log Out
-                </a>
-              </div>
-            </div>
-          </div>
-        </div>
-      </form>
+            </tbody>
+          </table>
+      </div>
+      <div class="below">
+        <input type="submit" class="submit" formaction="/deleteFile" value="Delete File" />
+        <input type="submit" class="submit" formaction="/processFile" value="Process File" />
+        <a href="/search" class="submit">Find Sheet Music</a>
+        <a href="/logout" class="submit">Log Out</a>
+        </form>
+      </div>
     </div>
   </body>
 </html>
