@@ -396,5 +396,5 @@ def send_css(filename):
 
 # -- Run Web Server
 port = int(os.environ.get("PORT", 8080))
-# run(app, host="0.0.0.0", port=port, reloader=True, debug=True)
-run(app, host="0.0.0.0", port=port, reloader=True)
+run(app, host="0.0.0.0", port=port, reloader=True, debug=True)
+# run(app, host="0.0.0.0", port=port, reloader=True)
