@@ -1,4 +1,4 @@
-from bottle import Bottle, request, response, run, template, static_file, redirect
+from bottle import request, response, run, template, static_file, redirect
 from bottle_sqlite import SQLitePlugin, sqlite3
 from itertools import chain
 from db_functions import *
@@ -9,6 +9,7 @@ from secret import key
 from rich import print
 # from rich.traceback import install
 # from rich import print, inspect, print_json, pretty
+import bottle
 import shutil
 import json
 import sys
@@ -16,7 +17,8 @@ import os
 
 # pretty.install()
 
-app = Bottle()
+# app = Bottle()
+app = bottle.app()
 plugin = SQLitePlugin(dbfile="pianists.db", detect_types=sqlite3.PARSE_DECLTYPES|sqlite3.PARSE_COLNAMES)
 app.install(plugin)
 
