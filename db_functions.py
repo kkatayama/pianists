@@ -15,11 +15,16 @@ All functions support a full SQL [query] or a python [dict]
 # -- checkPassword()    - check if password matches
 # -- clean()            - sanitize data for json delivery
 """
-from bottle import request, response, FormsDict, template
+from bottle import request, response, FormsDict, template, json_dumps, JSONPlugin
+#from rich.markup import escape
+#from rich import inspect
+# from rich import print
+import traceback
 import hashlib
 import codecs
 import sqlite3
 import json
+import sys
 import os
 import re
 
@@ -59,20 +64,37 @@ def insertRow(db, query="", **kwargs):
         user_id = insertRow(db, **params)
     """
     if query:
+        table = ""
+        columns = []
         col_values = kwargs.get("col_values")
     else:
-        table      = kwargs["table"]
-        columns    = kwargs["columns"]
+        table = kwargs["table"]
+        columns = kwargs["columns"]
         col_values = kwargs["col_values"]
         query = f"INSERT INTO {table} ({','.join(columns)}) VALUES ({', '.join(['?']*len(columns))});"
-    print(query)
-    if col_values:
-        print(" "*query.find("?"), col_values)
+    print(query, col_values) if col_values else print(query)
 
-    cur = db.execute(query, col_values) if col_values else db.execute(query)
-    if cur:
-        return cur.lastrowid
-    return False
+    try:
+        cur = db.execute(query, col_values) if col_values else db.execute(query)
+    except sqlite3.Error as e:
+        exc_type, exc_value, exc_tb = sys.exc_info()
+        tb_msgs = traceback.format_exception(exc_type, exc_value, exc_tb)
+        if isinstance(tb_msgs, list):
+            tb_msgs = ''.join(tb_msgs).splitlines()
+        err = {
+            f'SQLite.{e.__class__.__name__}': f'{" ".join(e.args)}',
+            'Debug Info': {
+                "query": query,
+                "kwargs": kwargs,
+                "parsed": {"table": table, "columns": columns, "col_values": col_values}
+            },
+            'SQLite Traceback': tb_msgs
+        }
+        print(err)
+        return err
+
+    return cur.lastrowid
+    # return False
 
 ###############################################################################
 #                               READ OPERATIONS                               #
@@ -111,18 +133,37 @@ def fetchRow(db, query="", **kwargs):
         row = fetchRow(db, **params)
     """
     if query:
+        table = ""
+        columns = []
+        condition = ""
         values = [kwargs.get("values")] if isinstance(kwargs.get("values"), str) else kwargs.get("values")
     else:
-        table     = kwargs.get("table")
-        columns   = "*" if not kwargs.get("columns") else ",".join(kwargs["columns"])
+        table = kwargs.get("table")
+        columns = "*" if not kwargs.get("columns") else ",".join(kwargs["columns"])
         condition = "1" if not kwargs.get("where") else f'{kwargs["where"]}'
-        values    = [kwargs.get("values")] if isinstance(kwargs.get("values"), str) else kwargs.get("values")
+        values = [kwargs.get("values")] if isinstance(kwargs.get("values"), str) else kwargs.get("values")
         query = f"SELECT {columns} FROM {table} WHERE {condition};"
-    print(query)
-    if values:
-        print(" "*query.find("?"), values)
+    print(query, values) if values else print(query)
 
-    row = db.execute(query, values).fetchone() if values else db.execute(query).fetchone()
+    try:
+        row = db.execute(query, values).fetchone() if values else db.execute(query).fetchone()
+    except sqlite3.Error as e:
+        exc_type, exc_value, exc_tb = sys.exc_info()
+        tb_msgs = traceback.format_exception(exc_type, exc_value, exc_tb)
+        if isinstance(tb_msgs, list):
+            tb_msgs = ''.join(tb_msgs).splitlines()
+        err = {
+            f'SQLite.{e.__class__.__name__}': f'{" ".join(e.args)}',
+            'Debug Info': {
+                "query": query,
+                "kwargs": kwargs,
+                "parsed": {"table": table, "columns": columns, "condition": condition, "values": values}
+            },
+            'SQLite Traceback': tb_msgs
+        }
+        print(err)
+        return err
+
     if row:
         return dict(row)
     return False
@@ -161,18 +202,37 @@ def fetchRows(db, query="", **kwargs):
         rows = fetchRows(db, **params)
     """
     if query:
+        table = ""
+        columns = []
+        condition = ""
         values = [kwargs.get("values")] if isinstance(kwargs.get("values"), str) else kwargs.get("values")
     else:
-        table     = kwargs.get("table")
-        columns   = "*" if not kwargs.get("columns") else ",".join(kwargs["columns"])
+        table = kwargs.get("table")
+        columns = "*" if not kwargs.get("columns") else ",".join(kwargs["columns"])
         condition = "1" if not kwargs.get("where") else f'{kwargs["where"]}'
-        values    = [kwargs.get("values")] if isinstance(kwargs.get("values"), str) else kwargs.get("values")
+        values = [kwargs.get("values")] if isinstance(kwargs.get("values"), str) else kwargs.get("values")
         query = f"SELECT {columns} FROM {table} WHERE {condition};"
-    print(query)
-    if values:
-        print(" "*query.find("?"), values)
+    print(query, values) if values else print(query)
 
-    rows = db.execute(query, values).fetchall() if values else db.execute(query).fetchall()
+    try:
+        rows = db.execute(query, values).fetchall() if values else db.execute(query).fetchall()
+    except sqlite3.Error as e:
+        exc_type, exc_value, exc_tb = sys.exc_info()
+        tb_msgs = traceback.format_exception(exc_type, exc_value, exc_tb)
+        if isinstance(tb_msgs, list):
+            tb_msgs = ''.join(tb_msgs).splitlines()
+        err = {
+            f'SQLite.{e.__class__.__name__}': f'{" ".join(e.args)}',
+            'Debug Info': {
+                "query": query,
+                "kwargs": kwargs,
+                "parsed": {"table": table, "columns": columns, "condition": condition, "values": values}
+            },
+            'SQLite Traceback': tb_msgs
+        }
+        print(err)
+        return err
+
     if rows:
         return [dict(row) for row in rows]
     return False
@@ -224,19 +284,42 @@ def updateRow(db, query="", **kwargs):
         num_edits = updateRow(db, **params)
     """
     if query:
+        table = ""
+        columns = []
+        condition = ""
         col_values = kwargs.get("col_values")
-        values     = [kwargs.get("values")] if isinstance(kwargs.get("values"), str) else kwargs.get("values")
+        values = [kwargs.get("values")] if isinstance(kwargs.get("values"), str) else kwargs.get("values")
     else:
-        table      = kwargs.get("table")
-        columns    = ", ".join([f"{col}=?" for col in kwargs["columns"]])
+        table = kwargs.get("table")
+        columns = ", ".join([f"{col}=?" for col in kwargs["columns"]])
         col_values = kwargs["col_values"]
-        condition  = f'({kwargs["where"]})'
-        values     = [kwargs["values"]] if isinstance(kwargs["values"], str) else kwargs["values"]
+        condition = f'({kwargs["where"]})'
+        values = [kwargs["values"]] if isinstance(kwargs["values"], str) else kwargs["values"]
         query = f"UPDATE {table} SET {columns} WHERE {condition};"
-    print(query)
-    print(" "*query.find("?"), col_values, values)
+    print(query, col_values, values) if (col_values and values) else print(query)
 
-    cur = db.execute(query, col_values+values) if (col_values and values) else db.execute(query)
+    try:
+        cur = db.execute(query, col_values+values) if (col_values and values) else db.execute(query)
+    except sqlite3.Error as e:
+        exc_type, exc_value, exc_tb = sys.exc_info()
+        tb_msgs = traceback.format_exception(exc_type, exc_value, exc_tb)
+        if isinstance(tb_msgs, list):
+            tb_msgs = ''.join(tb_msgs).splitlines()
+        err = {
+            f'SQLite.{e.__class__.__name__}': f'{" ".join(e.args)}',
+            'Debug Info': {
+                "query": query,
+                "kwargs": kwargs,
+                "parsed": {
+                    "table": table, "columns": columns, "col_values": col_values,
+                    "condition": condition, "values": values
+                }
+            },
+            'SQLite Traceback': tb_msgs
+        }
+        print(err)
+        return err
+
     return cur.rowcount
 
 ###############################################################################
@@ -278,16 +361,37 @@ def deleteRow(db, query="", **kwargs):
         num_deletes = deleteRow(db, **params)
     """
     if query:
+        table = ""
+        condition = ""
         values = [kwargs["values"]] if isinstance(kwargs["values"], str) else kwargs["values"]
     else:
-        table      = kwargs.get("table")
-        condition  = f'({kwargs["where"]})'
-        values     = [kwargs["values"]] if isinstance(kwargs["values"], str) else kwargs["values"]
+        table = kwargs.get("table")
+        condition = f'({kwargs["where"]})'
+        values = [kwargs["values"]] if isinstance(kwargs["values"], str) else kwargs["values"]
         query = f"DELETE FROM {table} WHERE {condition};"
-    print(query)
-    print(" "*query.find("?"), values)
+    print(query, values) if values else print(query)
 
-    cur = db.execute(query, values)
+    try:
+        cur = db.execute(query, values)
+    except sqlite3.Error as e:
+        exc_type, exc_value, exc_tb = sys.exc_info()
+        tb_msgs = traceback.format_exception(exc_type, exc_value, exc_tb)
+        if isinstance(tb_msgs, list):
+            tb_msgs = ''.join(tb_msgs).splitlines()
+        err = {
+            f'SQLite.{e.__class__.__name__}': f'{" ".join(e.args)}',
+            'Debug Info': {
+                "query": query,
+                "kwargs": kwargs,
+                "parsed": {
+                    "table": table, "condition": condition, "values": values
+                }
+            },
+            'SQLite Traceback': tb_msgs
+        }
+        print(err)
+        return err
+
     return cur.rowcount
 
 # Helper Functions ############################################################
@@ -309,9 +413,6 @@ def checkPassword(plaintext, hex_pass):
     if test_digest == digest:
         return True
     return False
-
-def clean(data):
-    return json.loads(json.dumps(data, default=str))
 
 def mapUrlPaths(url_paths, req_items, table=""):
     # dt = "DATETIME NOT NULL DEFAULT (strftime('%Y-%m-%d %H:%M:%f', 'now', 'localtime'))"
@@ -477,33 +578,91 @@ def getCategories(db):
     }
     return fetchRows(db, **args)
 
-def clean(data):
-    # user_agent = request.environ["HTTP_USER_AGENT"] if request.environ.get("HTTP_USER_AGENT") else ""
-    # browser_agents = [
-    #     "Mozilla",
-    #     "Firefox",
-    #     "Seamonkey",
-    #     "Chrome",
-    #     "Chromium",
-    #     "Safari",
-    #     "OPR",
-    #     "Opera",
-    #     "MSIE",
-    #     "Trident",
-    # ]
+def checkUserAgent():
+    user_agent = request.environ["HTTP_USER_AGENT"] if request.environ.get("HTTP_USER_AGENT") else ""
+    browser_agents = [
+        "Mozilla",
+        "Firefox",
+        "Seamonkey",
+        "Chrome",
+        "Chromium",
+        "Safari",
+        "OPR",
+        "Opera",
+        "MSIE",
+        "Trident",
+    ]
     # print(f'user_agent = {user_agent}')
-    # regex = r"({})".format("|".join(browser_agents))
+    regex = r"({})".format("|".join(browser_agents))
 
+    if re.search(regex, user_agent):
+        # print({"BROWSER": user_agent})
+        return True
+    return False
+
+def clean(data):
     if isinstance(data, dict):
         for k, v in data.items():
             if isinstance(v, FormsDict):
                 data.update({k: dict(v)})
 
     str_data = json.dumps(data, default=str, indent=2)
-    # if re.search(regex, user_agent):
-    #     print(str_data)
-    #     return template("templates/prettify.tpl", data=str_data)
-
     cleaned = json.loads(str_data)
     print(cleaned)
     return cleaned
+
+def clean2(data):
+    if isinstance(data, dict):
+        for k, v in data.items():
+            if isinstance(v, FormsDict):
+                data.update({k: dict(v)})
+
+    str_data = json.dumps(data, default=str, indent=2)
+    if checkUserAgent():
+        return template("templates/prettify.tpl", data=str_data)
+
+    # cleaned = json.loads(str_data)
+    print(str_data)
+    return str_data
+
+class ErrorsRestPlugin(object):
+    name = 'ErrorsRestPlugin'
+    api = 2
+
+    def __init__(self, dumps=None):
+        """init()"""
+        self.json_dumps = dumps
+
+    def setup(self, app):
+        """Initialize Handler"""
+        for plugin in app.plugins:
+            if isinstance(plugin, JSONPlugin):
+                self.json_dumps = plugin.json_dumps
+                break
+
+        if not self.json_dumps:
+            self.json_dumps = json_dumps
+
+        def default_error_handler(res):
+            if res.content_type == "application/json":
+                return res.body
+            res.content_type = "application/json"
+
+            err_res = res.__dict__
+            if isinstance(err_res.get("traceback"), str):
+                err_res["traceback"] = err_res["traceback"].splitlines()
+            if res.status_code == 500:
+                err = {"Python Error": err_res}
+            else:
+                err = {"Server Error": err_res}
+
+            if checkUserAgent():
+                res.content_type = "text/html; charset=UTF-8"
+
+            return clean2(dict(**{'message': str(res.body)}, **err))
+
+        app.default_error_handler = default_error_handler
+
+    def apply(self, callback, route):
+        """Execute Handler"""
+        return callback

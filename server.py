@@ -1,6 +1,6 @@
-from bottle import request, response, run, template, static_file, redirect, HTTPError
-from bottle_errorsrest import ErrorsRestPlugin
+from bottle import install, request, response, run, template, static_file, redirect, HTTPError, get
 from bottle_sqlite import SQLitePlugin, sqlite3
+# from bottle_errorsrest import ErrorsRestPlugin
 from itertools import chain
 from db_functions import *
 from datetime import datetime
@@ -23,6 +23,7 @@ app = bottle.app()
 plugin = SQLitePlugin(dbfile="pianists.db", detect_types=sqlite3.PARSE_DECLTYPES|sqlite3.PARSE_COLNAMES)
 app.install(plugin)
 app.install(ErrorsRestPlugin())
+
 
 @app.route("/commands", method=["GET", "POST", "PUT", "DELETE", "OPTIONS"])
 def commands():
