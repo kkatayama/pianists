@@ -618,8 +618,8 @@ def clean2(data):
                 data.update({k: dict(v)})
 
     str_data = json.dumps(data, default=str, indent=2)
-    if checkUserAgent():
-        return template("templates/prettify.tpl", data=str_data)
+    # if checkUserAgent():
+    #     return template("templates/prettify.tpl", data=str_data)
 
     # cleaned = json.loads(str_data)
     print(str_data)
@@ -656,8 +656,8 @@ class ErrorsRestPlugin(object):
             else:
                 err = {"Server Error": err_res}
 
-            if checkUserAgent():
-                res.content_type = "text/html; charset=UTF-8"
+            # if checkUserAgent():
+            #     res.content_type = "text/html; charset=UTF-8"
 
             return clean2(dict(**{'message': str(res.body)}, **err))
 
