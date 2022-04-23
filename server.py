@@ -7,7 +7,7 @@ from datetime import datetime
 from pathlib import Path
 from hashlib import sha256
 from secret import key
-from rich import print
+# from rich import print
 # from rich.traceback import install
 # from rich import print, inspect, print_json, pretty
 import bottle
