@@ -1,0 +1,13 @@
+[Unit]
+Description=pianists Database GitHub Sync and Outgoing Monitor
+After=network.target
+
+[Service]
+User=katayama
+WorkingDirectory=/home/katayama/Documents/pianists
+ExecStart=/usr/bin/python3 /home/katayama/Documents/pianists/systemd/monitor.py
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
+

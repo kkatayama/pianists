@@ -1,0 +1,14 @@
+[Unit]
+Description=pianists Web Framework
+After=network.target
+
+[Service]
+User=katayama
+WorkingDirectory=/home/katayama/Documents/pianists
+ExecStart=/usr/bin/python3 /home/katayama/Documents/pianists/server.py
+EnvironmentFile=/home/katayama/Documents/pianists/systemd/pianists_service.conf
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
+

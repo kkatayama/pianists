@@ -1,12 +1,12 @@
 [Unit]
-Description=pianists Database GitHub Sync
+Description=pianists Database GitHub Sync and Outgoing Monitor
 After=network.target
 
 [Service]
 User=katayama
 WorkingDirectory=/home/katayama/Documents/pianists
 ExecStart=/bin/bash systemd/git_db.sh
-RestartSec=10
+Restart=on-failure
 
 [Install]
 WantedBy=multi-user.target
