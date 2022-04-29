@@ -44,7 +44,7 @@ class MonitorChanges(PatternMatchingEventHandler):
         log.info("git add -A")
         time.sleep(2)
 
-        repo.git.commit('-m', msg, author='katayama@udel.edu')
+        repo.git.commit('-m', f'{msg}', author='katayama@udel.edu')
         log.info("git commit -m")
         time.sleep(3)
 
