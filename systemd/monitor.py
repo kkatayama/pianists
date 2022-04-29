@@ -36,25 +36,20 @@ class MonitorChanges(PatternMatchingEventHandler):
     def on_modified(self, event):
         if ".db" in event.src_path:
             logging.info(f'DB Item Modified: "Updating GitHub"')
-            # self.git_update()
 
-            msg='sync db changes'
             repo = git.Repo(Path.cwd().joinpath('.git').as_posix())
-            logging.info("marking git repo...")
-            time.sleep(5)
-
             repo.git.add('--all')
             logging.info("git add -A")
-            time.sleep(4)
+            time.sleep(1)
 
             repo.git.commit('-am', f'{msg}', author='katayama@udel.edu')
             logging.info("git commit -am")
-            time.sleep(4)
+            time.sleep(1)
 
             origin = repo.remote(name="origin")
             origin.push()
             logging.info("git push")
-            time.sleep(3)
+            time.sleep(1)
 
 
 if __name__ == '__main__':
