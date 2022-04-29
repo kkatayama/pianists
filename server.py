@@ -1,12 +1,13 @@
 from bottle import install, request, response, run, template, static_file, redirect, HTTPError, get
 from bottle_sqlite import SQLitePlugin, sqlite3
 # from bottle_errorsrest import ErrorsRestPlugin
+from utils.db_functions import *
+from utils.secret import key
+
 from itertools import chain
-from db_functions import *
 from datetime import datetime
 from pathlib import Path
 from hashlib import sha256
-from secret import key
 # from rich import print
 # from rich.traceback import install
 # from rich import print, inspect, print_json, pretty
@@ -20,14 +21,14 @@ import os
 
 # app = Bottle()
 app = bottle.app()
-plugin = SQLitePlugin(dbfile="pianists.db", detect_types=sqlite3.PARSE_DECLTYPES|sqlite3.PARSE_COLNAMES)
+plugin = SQLitePlugin(dbfile="db/pianists.db", detect_types=sqlite3.PARSE_DECLTYPES|sqlite3.PARSE_COLNAMES)
 app.install(plugin)
 app.install(ErrorsRestPlugin())
 
 
 @app.route("/commands", method=["GET", "POST", "PUT", "DELETE", "OPTIONS"])
 def commands():
-    with open('all_commands.json') as f:
+    with open('docs/all_commands.json') as f:
         res = json.load(f)
     print(res)
     return res
@@ -38,7 +39,7 @@ def commands():
 @app.route("/", method="GET")
 @app.route("/login", method=["GET"])
 def index():
-    return template("templates/index.tpl")
+    return template("static/templates/index.tpl")
 
 @app.route("/login", method="POST")
 def login(db):
@@ -51,7 +52,7 @@ def login(db):
             "required params": ["username", "password"]
         }
         print(res)
-        return template("templates/index.tpl", res=res)
+        return template("static/templates/index.tpl", res=res)
 
     # -- check if user exists
     params = {
@@ -66,7 +67,7 @@ def login(db):
             "username": username
         }
         print(res)
-        return template("templates/index.tpl", res=res)
+        return template("static/templates/index.tpl", res=res)
 
     # -- check user supplied password (previous row statement has user data for username=[username])
     if not checkPassword(password, row["password"]):
@@ -76,7 +77,7 @@ def login(db):
             "password": password
         }
         print(res)
-        return template("templates/index.tpl", res=res)
+        return template("static/templates/index.tpl", res=res)
 
     # -- made it here: means username exists and checkPassword() returned True
     response.set_cookie("user_id", row["user_id"], secret=key)
@@ -86,12 +87,12 @@ def login(db):
         "username": row["username"]
     }
     print(res)
-    return template("templates/delay.tpl", res=res, location="/dashboard")
+    return template("static/templates/delay.tpl", res=res, location="/dashboard")
 
 @app.route("/register", method="GET")
 def register():
     print("registration page")
-    return template("templates/register.tpl")
+    return template("static/templates/register.tpl")
 
 @app.route("/createUser", method="POST")
 def createUser(db):
@@ -105,7 +106,7 @@ def createUser(db):
             "required params": ["username", "password", "password2"]
         }
         print(res)
-        return template("templates/register.tpl", res=res)
+        return template("static/templates/register.tpl", res=res)
 
     if plaintext != password2:
         res = {
@@ -114,7 +115,7 @@ def createUser(db):
             "password2": password2
         }
         print(res)
-        return template("templates/register.tpl", res=res)
+        return template("static/templates/register.tpl", res=res)
 
     password  = securePassword(plaintext)
     create_time = datetime.now()
@@ -132,7 +133,7 @@ def createUser(db):
             "username": row["username"]
         }
         print(res)
-        return template("templates/register.tpl", res=res)
+        return template("static/templates/register.tpl", res=res)
 
     # -- if user doesn't exist, create user
     params = {
@@ -148,7 +149,7 @@ def createUser(db):
         "username": username
     }
     print(res)
-    return template("templates/index.tpl", res=res)
+    return template("static/templates/index.tpl", res=res)
 
 @app.route('/logout', method="GET")
 def logout():
@@ -172,8 +173,8 @@ def dashboard(db):
     }
     rows = fetchRows(db, **params)
     if rows:
-        return template("templates/dashboard.tpl", rows=rows)
-    return template("templates/dashboard.tpl")
+        return template("static/templates/dashboard.tpl", rows=rows)
+    return template("static/templates/dashboard.tpl")
 
 
 ###############################################################################
@@ -183,7 +184,7 @@ def dashboard(db):
 def uploadFile():
     if not request.get_cookie("user_id", secret=key):
         redirect('/')
-    return template("templates/upload.tpl")
+    return template("static/templates/upload.tpl")
 
 @app.route("/uploadFile", method="POST")
 def uploadFile(db):
@@ -198,7 +199,7 @@ def uploadFile(db):
         res = {
             "message": f"file extension {ext} is not allowed"
         }
-        return template("templates/delay.tpl", res=clean(res), location="/dashboard")
+        return template("static/templates/delay.tpl", res=clean(res), location="/dashboard")
 
     entry_time = datetime.now()
     user_dir = Path(Path.cwd(), "pdf_files", user_id)
@@ -208,7 +209,7 @@ def uploadFile(db):
             "message": "file exists!",
             "file": user_dir.joinpath(file_name)
         }
-        return template("templates/delay.tpl", res=clean(res), location="/dashboard")
+        return template("static/templates/delay.tpl", res=clean(res), location="/dashboard")
 
     upload.save(user_dir.as_posix())
     params = {
@@ -223,7 +224,7 @@ def uploadFile(db):
         "entry_id": entry_id
     }
     print(res)
-    return template("templates/delay.tpl", res=res, location="/dashboard")
+    return template("static/templates/delay.tpl", res=res, location="/dashboard")
     # redirect("/dashboard")
 
 @app.route("/deleteFile", method="POST")
@@ -246,7 +247,7 @@ def deleteFile(db):
             "entry_id": entry_id
         }
         print(res)
-        return template("templates/delay.tpl", res=res, location="/dashboard")
+        return template("static/templates/delay.tpl", res=res, location="/dashboard")
 
     # -- file found and belongs to user
     file_name = row["file_name"]
@@ -269,7 +270,7 @@ def deleteFile(db):
         "file": user_pdf.as_posix()
     }
     print(res)
-    return template("templates/delay.tpl", res=res, location="/dashboard")
+    return template("static/templates/delay.tpl", res=res, location="/dashboard")
 
 @app.route('/processFile', method="POST")
 def processFile(db):
@@ -291,7 +292,7 @@ def processFile(db):
             "entry_id": entry_id
         }
         print(res)
-        return template("templates/delay.tpl", res=res, location="/dashboard")
+        return template("static/templates/delay.tpl", res=res, location="/dashboard")
     # -- file found and belongs to user
     file_name = row["file_name"]
     user_dir = Path(Path.cwd(), "pdf_files", user_id)
@@ -301,7 +302,7 @@ def processFile(db):
         "file": user_pdf
     }
     print(res)
-    return template("templates/delay.tpl", res=res, location="/dashboard")
+    return template("static/templates/delay.tpl", res=res, location="/dashboard")
 
 @app.route("/search", method=["GET", "POST"])
 def search(db):
@@ -309,7 +310,7 @@ def search(db):
     if not request.get_cookie("user_id", secret=key):
         redirect('/')
     if not request.params:
-        return template("templates/search.tpl",
+        return template("static/templates/search.tpl",
                         user_values={}, levels=getLevels(db), categories=getCategories(db))
 
     user_id = str(request.get_cookie("user_id", secret=key))
@@ -332,7 +333,7 @@ def search(db):
     if not rows:
         rows = {}
     print(rows)
-    return template("templates/search.tpl",
+    return template("static/templates/search.tpl",
                     user_values=user_values, query=query,
                     levels=getLevels(db), categories=getCategories(db), rows=rows)
 
@@ -341,7 +342,7 @@ def downloadFile(db):
     if not request.get_cookie("user_id", secret=key):
         redirect('/')
     if not request.params.get("entry_id"):
-        return template("templates/delay.tpl", res={"message": "missing 'entry_id'"}, location="/dashboard")
+        return template("static/templates/delay.tpl", res={"message": "missing 'entry_id'"}, location="/dashboard")
     user_id = str(request.get_cookie("user_id", secret=key))
     mmf_entry_id = str(request.params.get("entry_id"))
     mmf_file = fetchRow(db, table="mmf", where="entry_id = ?", values=[mmf_entry_id])
@@ -361,7 +362,7 @@ def downloadFile(db):
             "title": title,
             "file": user_dir.joinpath(file_name)
         }
-        return template("templates/delay.tpl", res=clean(res), location="/dashboard")
+        return template("static/templates/delay.tpl", res=clean(res), location="/dashboard")
 
     # -- download (copy) file
     src_file = str(Path(Path.cwd(), "making_music_fun", mmf_file["pdf_file"]))
@@ -382,7 +383,7 @@ def downloadFile(db):
         "entry_id": entry_id
     }
     print(res)
-    return template("templates/delay.tpl", res=res, location="/dashboard")
+    return template("static/templates/delay.tpl", res=res, location="/dashboard")
     # redirect("/dashboard")
 
 
