@@ -60,7 +60,7 @@ class MonitorChanges(PatternMatchingEventHandler):
 if __name__ == '__main__':
     print(Path.cwd())
     # log = getLogger()
-    logging.basicConfig(level=logging.DEBUG)
+    logging.basicConfig(level=logging.INFO)
 
     event_handler = MonitorChanges(patterns=["*.db", "*.pdf"], ignore_patterns=["*.py"], ignore_directories=True)
     observer = Observer()
