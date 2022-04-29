@@ -293,10 +293,38 @@ def processFile(db):
         }
         print(res)
         return template("static/templates/delay.tpl", res=res, location="/dashboard")
+
     # -- file found and belongs to user
     file_name = row["file_name"]
     user_dir = Path(Path.cwd(), "pdf_files", user_id)
     user_pdf = Path(user_dir, file_name).as_posix()
+
+    dst_pdf = Path(Path.cwd(), "pdf_outgoing", "")
+    # -- send file to [pdf_outgoing]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     res = {
         "message": "processing file",
         "file": user_pdf
