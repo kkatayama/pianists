@@ -11,30 +11,26 @@ import git
 
 
 class MonitorChanges(PatternMatchingEventHandler):
-    def catch_all_handler(self, event):
-        pass
-        # log.debug(event)
+    # def catch_all_handler(self, event):
+    #     pass
+    #     log.debug(event)
 
     def on_moved(self, event):
-        log.debug(f'MOVED: "{event.src_path}"')
         if ".db" in event.src_path:
             log.warn(f'DB Moved???: "Updating GitHub"')
             self.git_update()
 
     def on_created(self, event):
-        log.debug(f'CREATED: "{event.src_path}"')
         if ".db" in event.src_path:
             log.info(f'DB Item Added: "Updating GitHub"')
             self.git_update()
 
     def on_deleted(self, event):
-        log.debug(f'DELETED: "{event.src_path}"')
         if ".db" in event.src_path:
             log.info(f'DB Item Deleted: "Updating GitHub"')
             self.git_update()
 
     def on_modified(self, event):
-        log.debug(f'MODIFIED: "{event.src_path}"')
         if ".db" in event.src_path:
             log.info(f'DB Item Modified: "Updating GitHub"')
             self.git_update()
@@ -50,12 +46,15 @@ class MonitorChanges(PatternMatchingEventHandler):
 
         repo.git.commit('-m', msg, author='katayama@udel.edu')
         log.info("git commit -m")
-        time.sleep(4)
+        time.sleep(3)
 
-        origin = repo.remote(name="main")
+        origin = repo.remote(name="origin")
+        log.info('repo.rempte(name="origin"')
+        time.sleep(3)
+
         origin.push()
         log.info("git push")
-        time.sleep(5)
+        time.sleep(3)
 
 
 
