@@ -38,27 +38,26 @@ class MonitorChanges(PatternMatchingEventHandler):
             log.info(f'DB Item Modified: "Updating GitHub"')
             # self.git_update()
 
-    def git_update(self, msg='sync db changes'):
-        repo = git.Repo(Path.cwd().joinpath('.git').as_posix())
-        log.info("marking git repo...")
-        time.sleep(5)
+            msg='sync db changes'
+            repo = git.Repo(Path.cwd().joinpath('.git').as_posix())
+            log.info("marking git repo...")
+            time.sleep(5)
 
-        repo.git.add('--all')
-        log.info("git add -A")
-        time.sleep(4)
+            repo.git.add('--all')
+            log.info("git add -A")
+            time.sleep(4)
 
-        repo.git.commit('-am', f'{msg}', author='katayama@udel.edu')
-        log.info("git commit -am")
-        time.sleep(4)
+            repo.git.commit('-am', f'{msg}', author='katayama@udel.edu')
+            log.info("git commit -am")
+            time.sleep(4)
 
-        origin = repo.remote(name="origin")
-        log.info('repo.rempte(name="origin"')
-        time.sleep(4)
+            origin = repo.remote(name="origin")
+            log.info('repo.rempte(name="origin"')
+            time.sleep(4)
 
-        origin.push()
-        log.info("git push")
-        time.sleep(3)
-
+            origin.push()
+            log.info("git push")
+            time.sleep(3)
 
 
 if __name__ == '__main__':
