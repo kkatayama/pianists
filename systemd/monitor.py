@@ -16,41 +16,44 @@ class MonitorChanges(PatternMatchingEventHandler):
     #     log.debug(event)
 
     def on_moved(self, event):
-        if ".db" in event.src_path.decode():
-            log.warn(f'DB Moved???: "Updating GitHub"')
-            # self.git_update()
+        # if ".db" in event.src_path:
+        #     log.warn(f'DB Moved???: "Updating GitHub"')
+        #     # self.git_update()
+        return
 
     def on_created(self, event):
-        if ".db" in event.src_path.decode():
-            log.info(f'DB Item Added: "Updating GitHub"')
-            # self.git_update()
+        # if ".db" in event.src_path:
+        #     log.info(f'DB Item Added: "Updating GitHub"')
+        #     # self.git_update()
+        return
 
     def on_deleted(self, event):
-        if ".db" in event.src_path.decode():
-            log.info(f'DB Item Deleted: "Updating GitHub"')
-            # self.git_update()
+        # if ".db" in event.src_path:
+        #     log.info(f'DB Item Deleted: "Updating GitHub"')
+        #     # self.git_update()
+        return
 
     def on_modified(self, event):
-        if ".db" in event.src_path.decode():
+        if ".db" in event.src_path:
             log.info(f'DB Item Modified: "Updating GitHub"')
             # self.git_update()
 
     def git_update(self, msg='sync db changes'):
         repo = git.Repo(Path.cwd().joinpath('.git').as_posix())
         log.info("marking git repo...")
-        time.sleep(2)
+        time.sleep(5)
 
         repo.git.add('--all')
         log.info("git add -A")
-        time.sleep(2)
+        time.sleep(4)
 
-        repo.git.commit('-m', f'{msg}', author='katayama@udel.edu')
-        log.info("git commit -m")
-        time.sleep(3)
+        repo.git.commit('-am', f'{msg}', author='katayama@udel.edu')
+        log.info("git commit -am")
+        time.sleep(4)
 
         origin = repo.remote(name="origin")
         log.info('repo.rempte(name="origin"')
-        time.sleep(3)
+        time.sleep(4)
 
         origin.push()
         log.info("git push")
