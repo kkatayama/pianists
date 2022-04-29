@@ -4,8 +4,8 @@ After=network.target
 
 [Service]
 User=katayama
-WorkingDirectory=/home/katayama/Documents/pianists/systemd
-ExecStart=/bin/bash git_db.sh
+WorkingDirectory=/home/katayama/Documents/pianists
+ExecStart=/bin/bash systemd/git_db.sh
 RestartSec=10
 
 [Install]
