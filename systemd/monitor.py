@@ -1,8 +1,8 @@
 from watchdog.events import PatternMatchingEventHandler
 from watchdog.observers import Observer
 from pathlib import Path
-from teddy import getLogger
-from rich import print
+# from teddy import getLogger
+# from rich import print
 import logging
 import time
 import sys
@@ -35,34 +35,32 @@ class MonitorChanges(PatternMatchingEventHandler):
 
     def on_modified(self, event):
         if ".db" in event.src_path:
-            log.info(f'DB Item Modified: "Updating GitHub"')
+            logging.info(f'DB Item Modified: "Updating GitHub"')
             # self.git_update()
 
             msg='sync db changes'
             repo = git.Repo(Path.cwd().joinpath('.git').as_posix())
-            log.info("marking git repo...")
+            logging.info("marking git repo...")
             time.sleep(5)
 
             repo.git.add('--all')
-            log.info("git add -A")
+            logging.info("git add -A")
             time.sleep(4)
 
             repo.git.commit('-am', f'{msg}', author='katayama@udel.edu')
-            log.info("git commit -am")
+            logging.info("git commit -am")
             time.sleep(4)
 
             origin = repo.remote(name="origin")
-            log.info('repo.rempte(name="origin"')
-            time.sleep(4)
-
             origin.push()
-            log.info("git push")
+            logging.info("git push")
             time.sleep(3)
 
 
 if __name__ == '__main__':
     print(Path.cwd())
-    log = getLogger()
+    # log = getLogger()
+    logging.basicConfig(level=logging.DEBUG)
 
     event_handler = MonitorChanges(patterns=["*.db", "*.pdf"], ignore_patterns=["*.py"], ignore_directories=True)
     observer = Observer()
