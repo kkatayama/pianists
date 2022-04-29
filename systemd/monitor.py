@@ -16,24 +16,24 @@ class MonitorChanges(PatternMatchingEventHandler):
     #     log.debug(event)
 
     def on_moved(self, event):
-        if ".db" in event.src_path:
+        if ".db" in event.src_path.decode():
             log.warn(f'DB Moved???: "Updating GitHub"')
-            self.git_update()
+            # self.git_update()
 
     def on_created(self, event):
-        if ".db" in event.src_path:
+        if ".db" in event.src_path.decode():
             log.info(f'DB Item Added: "Updating GitHub"')
-            self.git_update()
+            # self.git_update()
 
     def on_deleted(self, event):
-        if ".db" in event.src_path:
+        if ".db" in event.src_path.decode():
             log.info(f'DB Item Deleted: "Updating GitHub"')
-            self.git_update()
+            # self.git_update()
 
     def on_modified(self, event):
-        if ".db" in event.src_path:
+        if ".db" in event.src_path.decode():
             log.info(f'DB Item Modified: "Updating GitHub"')
-            self.git_update()
+            # self.git_update()
 
     def git_update(self, msg='sync db changes'):
         repo = git.Repo(Path.cwd().joinpath('.git').as_posix())
