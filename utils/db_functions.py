@@ -19,6 +19,8 @@ from bottle import request, response, FormsDict, template, json_dumps, JSONPlugi
 #from rich.markup import escape
 #from rich import inspect
 # from rich import print
+from pathlib import Path
+import subprocess
 import traceback
 import hashlib
 import codecs
@@ -383,7 +385,6 @@ def deleteRow(db, query="", **kwargs):
     return cur.rowcount
 
 # Helper Functions ############################################################
-
 def securePassword(plaintext):
     salt = os.urandom(32)
     digest = hashlib.pbkdf2_hmac("sha256", plaintext.encode(), salt, 1000)
@@ -402,6 +403,17 @@ def checkPassword(plaintext, hex_pass):
         return True
     return False
 
+def git_update():
+    cmds = (
+        ["git", "add", "--all"],
+        ["git", "commit", "--author=katayama@udel.edu", "-am", "sync db changes"],
+        ["git", "push", "--porcelain", "origin"],
+    )
+    for cmd in cmds:
+        print(subprocess.Popen(cmd, cwd=Path.cwd().as_posix(), universal_newlines=False, shell=None))
+
+
+# Parsers #####################################################################
 def mapUrlPaths(url_paths, req_items, table=""):
     dt = "NOT NULL DEFAULT (strftime('%Y-%m-%d %H:%M:%f', 'now', 'localtime'))"
     r = re.compile(r"/", re.VERBOSE)
@@ -470,6 +482,9 @@ def parseUrlPaths(url_paths, req_items, columns, checkFilters=False):
         return params, filters
     return params
 
+###############################################################################
+#                               Tablee Functions                              #
+###############################################################################
 def addTable(db, query="", **kwargs):
     if not query:
         # table = kwargs.get("table")
@@ -477,6 +492,7 @@ def addTable(db, query="", **kwargs):
         columns = kwargs.get("columns")
         query = f'CREATE TABLE {table} ({", ".join(columns)});'
     print(query)
+
     try:
         cur = db.execute(query)
     except (sqlite3.ProgrammingError, sqlite3.OperationalError) as e:
@@ -616,6 +632,7 @@ class ErrorsRestPlugin(object):
     api = 2
 
     def __init__(self, dumps=None):
+        """"""
         self.json_dumps = dumps
 
     def setup(self, app):

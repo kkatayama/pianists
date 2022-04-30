@@ -1,4 +1,4 @@
-from bottle import install, request, response, run, template, static_file, redirect, HTTPError, get
+from bottle import request, response, run, template, static_file, redirect, HTTPError, get
 from bottle_sqlite import SQLitePlugin, sqlite3
 # from bottle_errorsrest import ErrorsRestPlugin
 from utils.db_functions import *
@@ -281,7 +281,7 @@ def processFile(db):
     params = {
         "table": "files",
         "where": "user_id=? AND entry_id=?",
-        "values": [user_id, entry_id],
+        "values[']": [user_id, entry_id],
     }
     row = fetchRow(db, **params)
 
@@ -301,29 +301,7 @@ def processFile(db):
 
     dst_pdf = Path(Path.cwd(), "pdf_outgoing", "")
     # -- send file to [pdf_outgoing]
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+?
 
     res = {
         "message": "processing file",
@@ -384,6 +362,7 @@ def downloadFile(db):
     entry_time = datetime.now()
     user_dir = Path(Path.cwd(), "pdf_files", user_id)
     Path.mkdir(user_dir, exist_ok=True)
+
     if user_dir.joinpath(file_name).exists():
         res = {
             "message": "file exists!",
