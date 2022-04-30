@@ -9,7 +9,6 @@ import sys
 import git
 
 
-
 class MonitorChanges(PatternMatchingEventHandler):
     # def catch_all_handler(self, event):
     #     pass

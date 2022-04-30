@@ -97,7 +97,7 @@ def register():
 @app.route("/createUser", method="POST")
 def createUser(db):
     try:
-        username  = request.POST["username"]
+        username = request.POST["username"]
         plaintext = request.POST["password"]
         password2 = request.POST["password2"]
     except KeyError:

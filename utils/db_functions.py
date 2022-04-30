@@ -35,7 +35,6 @@ import re
 def insertRow(db, query="", **kwargs):
     """
     Insert data into the database
-
     ARGS:
         Required - db (object)          - the database connection object
         Optional - query (str)          - a complete SQL query
@@ -102,7 +101,6 @@ def insertRow(db, query="", **kwargs):
 def fetchRow(db, query="", **kwargs):
     """
     Fetch a single row from a table in the database
-
     ARGS:
         Required - db (object)          - the database connection object
         Optional - query (str)          - a complete SQL query
@@ -171,7 +169,6 @@ def fetchRow(db, query="", **kwargs):
 def fetchRows(db, query="", **kwargs):
     """
     Fetch multiple rows from a table in the database
-
     ARGS:
         Required - db (object)          - the database connection object
         Optional - query (str)          - a complete SQL query
@@ -243,7 +240,6 @@ def fetchRows(db, query="", **kwargs):
 def updateRow(db, query="", **kwargs):
     """
     Update data in the database
-
     ARGS:
         Required - db (object)          - the database connection object
         Optional - query (str)          - a complete SQL query
@@ -265,12 +261,8 @@ def updateRow(db, query="", **kwargs):
                                 col_values=["user_06"], values=["6"])
 
     EXAMPLE: with [params] directly
-        num_edits = updateRow(db,
-                                table="users",
-                                columns=["username"],
-                                col_values=["user_06"],
-                                where="user_id=?",
-                                values=["6"])
+        num_edits = updateRow(db, table="users", columns=["username"], col_values=["user_06"],
+                                where="user_id=?", values=["6"])
 
     EXAMPLE: with [params] as (dict)
         username = "user_06"
@@ -328,7 +320,6 @@ def updateRow(db, query="", **kwargs):
 def deleteRow(db, query="", **kwargs):
     """
     Delete row(s) from the database
-
     ARGS:
         Required - db (object)          - the database connection object
         Optional - query (str)          - a complete SQL query
@@ -346,10 +337,7 @@ def deleteRow(db, query="", **kwargs):
         num_deletes = deleteRow(db, query="DELETE FROM users WHERE (user_id=?);", values=["6"])
 
     EXAMPLE: with [params] directly
-        num_deletes = deleteRow(db,
-                                table="users",
-                                where="user_id=?",
-                                col_values=["6"])
+        num_deletes = deleteRow(db, table="users", where="user_id=?", col_values=["6"])
 
     EXAMPLE: with [params] as (dict)
         user_id = 6
@@ -415,7 +403,6 @@ def checkPassword(plaintext, hex_pass):
     return False
 
 def mapUrlPaths(url_paths, req_items, table=""):
-    # dt = "DATETIME NOT NULL DEFAULT (strftime('%Y-%m-%d %H:%M:%f', 'now', 'localtime'))"
     dt = "NOT NULL DEFAULT (strftime('%Y-%m-%d %H:%M:%f', 'now', 'localtime'))"
     r = re.compile(r"/", re.VERBOSE)
     keys = map(str.lower, r.split(url_paths)[::2])
@@ -446,7 +433,6 @@ def mapUrlPaths(url_paths, req_items, table=""):
     return params, columns
 
 def parseURI(url_paths):
-    # print(f'url_paths = {url_paths}')
     r = re.compile(r"/", re.VERBOSE)
     url_split = r.split(url_paths)
 
@@ -477,7 +463,7 @@ def parseUrlPaths(url_paths, req_items, columns, checkFilters=False):
         req_filters = req_items["filter"] if req_items.get("filter") else ""
         filters = " AND ".join([f for f in [url_filters, req_filters] if f])
     # -- process params
-    req_params = {k:v for (k,v) in req_items.items() if k in columns}
+    req_params = {k: v for (k, v) in req_items.items() if k in columns}
     params = {**url_params, **req_params}
 
     if checkFilters:
@@ -630,7 +616,6 @@ class ErrorsRestPlugin(object):
     api = 2
 
     def __init__(self, dumps=None):
-        """init()"""
         self.json_dumps = dumps
 
     def setup(self, app):
