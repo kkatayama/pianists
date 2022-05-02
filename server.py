@@ -239,7 +239,7 @@ def processFile(db):
     params = {
         "table": "files",
         "where": "user_id=? AND entry_id=?",
-        "values[']": [user_id, entry_id],
+        "values": [user_id, entry_id],
     }
     row = fetchRow(db, **params)
 
@@ -364,8 +364,8 @@ def send_css(filename):
 
 # -- Run Web Server
 port = int(os.environ.get("PORT", 8080))
-run(app, host="0.0.0.0", port=port, reloader=True, debug=True)
-# run(app, host="0.0.0.0", port=port, reloader=True)
+# run(app, host="0.0.0.0", port=port, reloader=True, debug=True)
+run(app, host="0.0.0.0", port=port, reloader=True)
 
 ###############################################################################
 #                                  Deprecated                                 #
