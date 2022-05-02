@@ -15,13 +15,17 @@ All functions support a full SQL [query] or a python [dict]
 # -- checkPassword()    - check if password matches
 # -- clean()            - sanitize data for json delivery
 """
-from bottle import request, response, FormsDict, template, json_dumps, JSONPlugin
-#from rich.markup import escape
-#from rich import inspect
+from bottle import request, response, FormsDict, json_dumps, JSONPlugin
+from datetime import datetime
+# from rich.markup import escape
+# from rich import inspect
 # from rich import print
+from functools import wraps
 from pathlib import Path
+
 import subprocess
 import traceback
+import logging
 import hashlib
 import codecs
 import sqlite3
@@ -416,6 +420,165 @@ def git_update():
 ###############################################################################
 #                               Tablee Functions                              #
 ###############################################################################
+def getLevels(db):
+    args = {
+        "table": 'mmf',
+        "columns": ["level"],
+        "where": "? GROUP BY level",
+        "values": ['1']
+    }
+    return fetchRows(db, **args)
+
+def getCategories(db):
+    args = {
+        "table": 'mmf',
+        "columns": ["category"],
+        "where": "? GROUP BY category",
+        "values": ['1']
+    }
+    return fetchRows(db, **args)
+
+def checkUserAgent():
+    user_agent = request.environ["HTTP_USER_AGENT"] if request.environ.get("HTTP_USER_AGENT") else ""
+    browser_agents = [
+        "Mozilla",
+        "Firefox",
+        "Seamonkey",
+        "Chrome",
+        "Chromium",
+        "Safari",
+        "OPR",
+        "Opera",
+        "MSIE",
+        "Trident",
+    ]
+    # print(f'user_agent = {user_agent}')
+    regex = r"({})".format("|".join(browser_agents))
+
+    if re.search(regex, user_agent):
+        # print({"BROWSER": user_agent})
+        return True
+    return False
+
+def clean(data):
+    if isinstance(data, dict):
+        for k, v in data.items():
+            if isinstance(v, FormsDict):
+                data.update({k: dict(v)})
+
+    str_data = json.dumps(data, default=str, indent=2)
+    cleaned = json.loads(str_data)
+    print(cleaned)
+    return cleaned
+
+def clean2(data):
+    if isinstance(data, dict):
+        for k, v in data.items():
+            if isinstance(v, FormsDict):
+                data.update({k: dict(v)})
+
+    str_data = json.dumps(data, default=str, indent=2)
+    # if checkUserAgent():
+    #     return template("templates/prettify.tpl", data=str_data)
+
+    # cleaned = json.loads(str_data)
+    print(str_data)
+    return str_data
+
+# Logging #####################################################################
+# -- https://stackoverflow.com/questions/31080214/python-bottle-always-logs-to-console-no-logging-to-file
+def getLogger():
+    logger = logging.getLogger('pianists.py')
+
+    logger.setLevel(logging.INFO)
+    file_handler = logging.FileHandler('pianists.log')
+    formatter = logging.Formatter('%(msg)s')
+    file_handler.setLevel(logging.DEBUG)
+    file_handler.setFormatter(formatter)
+    logger.addHandler(file_handler)
+    return logger
+
+def log_to_logger(fn):
+    """
+    Wrap a Bottle request so that a log line is emitted after it's handled.
+    (This decorator can be extended to take the desired logger as a param.)
+    """
+    @wraps(fn)
+    def _log_to_logger(*args, **kwargs):
+        request_time = datetime.now()
+        actual_response = fn(*args, **kwargs)
+        ip_address = request.environ.get('HTTP_X_FORWARDED_FOR') or request.environ.get('REMOTE_ADDR') or request.remote_addr
+        logger.info('%s %s %s %s %s' % (ip_address,
+                                        request_time,
+                                        request.method,
+                                        request.url,
+                                        response.status))
+
+        if isinstance(actual_response, dict):
+            if not actual_response.get("message") == "available commands":
+                logger.info(json.dumps({"request.params": dict(request.params)}))
+                logger.info(json.dumps(actual_response, default=str, indent=2))
+        else:
+            # logger.info(json.dumps(actual_response, default=str, indent=2))
+            # logger.info(json.dumps({'msg': }, default=str, indent=2))
+            logger.info(actual_response)
+        return actual_response
+    return _log_to_logger
+
+
+logger = getLogger()
+
+
+# ErrorRestPlugin #############################################################
+class ErrorsRestPlugin(object):
+    """Custom Re-Write"""
+
+    name = 'ErrorsRestPlugin'
+    api = 2
+
+    def __init__(self, dumps=None):
+        """INIT"""
+        self.json_dumps = dumps
+
+    def setup(self, app):
+        """Initialize Handler"""
+        for plugin in app.plugins:
+            if isinstance(plugin, JSONPlugin):
+                self.json_dumps = plugin.json_dumps
+                break
+
+        if not self.json_dumps:
+            self.json_dumps = json_dumps
+
+        def default_error_handler(res):
+            if res.content_type == "application/json":
+                return res.body
+            res.content_type = "application/json"
+
+            err_res = res.__dict__
+            if isinstance(err_res.get("traceback"), str):
+                err_res["traceback"] = err_res["traceback"].splitlines()
+            if res.status_code == 500:
+                err = {"Python Error": err_res}
+            else:
+                err = {"Server Error": err_res}
+
+            # if checkUserAgent():
+            #     res.content_type = "text/html; charset=UTF-8"
+
+            return clean2(dict(**{'message': str(res.body)}, **err))
+
+        app.default_error_handler = default_error_handler
+
+    def apply(self, callback, route):
+        """Execute Handler"""
+        return callback
+
+###########################################################################
+#                                Deprecated                               #
+###########################################################################
+"""
+
 def addTable(db, query="", **kwargs):
     if not query:
         # table = kwargs.get("table")
@@ -493,117 +656,7 @@ def getColumns(db, table, required=False, editable=False, non_editable=False, re
         return re.search(r"(.*_id)", " ".join(non_editable_columns)).group()
     return table["columns"]
 
-def getLevels(db):
-    args = {
-        "table": 'mmf',
-        "columns": ["level"],
-        "where": "? GROUP BY level",
-        "values": ['1']
-    }
-    return fetchRows(db, **args)
 
-def getCategories(db):
-    args = {
-        "table": 'mmf',
-        "columns": ["category"],
-        "where": "? GROUP BY category",
-        "values": ['1']
-    }
-    return fetchRows(db, **args)
-
-def checkUserAgent():
-    user_agent = request.environ["HTTP_USER_AGENT"] if request.environ.get("HTTP_USER_AGENT") else ""
-    browser_agents = [
-        "Mozilla",
-        "Firefox",
-        "Seamonkey",
-        "Chrome",
-        "Chromium",
-        "Safari",
-        "OPR",
-        "Opera",
-        "MSIE",
-        "Trident",
-    ]
-    # print(f'user_agent = {user_agent}')
-    regex = r"({})".format("|".join(browser_agents))
-
-    if re.search(regex, user_agent):
-        # print({"BROWSER": user_agent})
-        return True
-    return False
-
-def clean(data):
-    if isinstance(data, dict):
-        for k, v in data.items():
-            if isinstance(v, FormsDict):
-                data.update({k: dict(v)})
-
-    str_data = json.dumps(data, default=str, indent=2)
-    cleaned = json.loads(str_data)
-    print(cleaned)
-    return cleaned
-
-def clean2(data):
-    if isinstance(data, dict):
-        for k, v in data.items():
-            if isinstance(v, FormsDict):
-                data.update({k: dict(v)})
-
-    str_data = json.dumps(data, default=str, indent=2)
-    # if checkUserAgent():
-    #     return template("templates/prettify.tpl", data=str_data)
-
-    # cleaned = json.loads(str_data)
-    print(str_data)
-    return str_data
-
-class ErrorsRestPlugin(object):
-    name = 'ErrorsRestPlugin'
-    api = 2
-
-    def __init__(self, dumps=None):
-        """"""
-        self.json_dumps = dumps
-
-    def setup(self, app):
-        """Initialize Handler"""
-        for plugin in app.plugins:
-            if isinstance(plugin, JSONPlugin):
-                self.json_dumps = plugin.json_dumps
-                break
-
-        if not self.json_dumps:
-            self.json_dumps = json_dumps
-
-        def default_error_handler(res):
-            if res.content_type == "application/json":
-                return res.body
-            res.content_type = "application/json"
-
-            err_res = res.__dict__
-            if isinstance(err_res.get("traceback"), str):
-                err_res["traceback"] = err_res["traceback"].splitlines()
-            if res.status_code == 500:
-                err = {"Python Error": err_res}
-            else:
-                err = {"Server Error": err_res}
-
-            # if checkUserAgent():
-            #     res.content_type = "text/html; charset=UTF-8"
-
-            return clean2(dict(**{'message': str(res.body)}, **err))
-
-        app.default_error_handler = default_error_handler
-
-    def apply(self, callback, route):
-        """Execute Handler"""
-        return callback
-
-###########################################################################
-#                                Deprecated                               #
-###########################################################################
-"""
 # Parsers #####################################################################
 def mapUrlPaths(url_paths, req_items, table=""):
     dt = "NOT NULL DEFAULT (strftime('%Y-%m-%d %H:%M:%f', 'now', 'localtime'))"

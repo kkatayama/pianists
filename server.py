@@ -1,18 +1,18 @@
-from bottle import request, response, run, template, static_file, redirect, HTTPError, get
+from bottle import request, response, run, template, static_file, redirect
 from bottle_sqlite import SQLitePlugin, sqlite3
 # from bottle_errorsrest import ErrorsRestPlugin
 from utils.db_functions import (
-    insertRow, fetchRow, fetchRows, updateRow, deleteRow,
-    securePassword, checkPassword, git_update, checkUserAgent,
-    addTable, deleteTable, getTable, getTables, getColumns,
-    getLevels, getCategories, clean, clean2, ErrorsRestPlugin
+    insertRow, fetchRow, fetchRows, deleteRow,
+    securePassword, checkPassword, git_update,
+    getLevels, getCategories, clean,
+    log_to_logger, ErrorsRestPlugin
 )
 from utils.secret import key
 
 from itertools import chain
 from datetime import datetime
 from pathlib import Path
-from hashlib import sha256
+# from hashlib import sha256
 # from rich import print
 # from rich.traceback import install
 # from rich import print, inspect, print_json, pretty
@@ -28,6 +28,7 @@ import os
 app = bottle.app()
 plugin = SQLitePlugin(dbfile="db/pianists.db", detect_types=sqlite3.PARSE_DECLTYPES|sqlite3.PARSE_COLNAMES)
 app.install(plugin)
+app.install(log_to_logger)
 app.install(ErrorsRestPlugin())
 
 
