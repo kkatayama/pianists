@@ -1,7 +1,12 @@
 from bottle import request, response, run, template, static_file, redirect, HTTPError, get
 from bottle_sqlite import SQLitePlugin, sqlite3
 # from bottle_errorsrest import ErrorsRestPlugin
-from utils.db_functions import *
+from utils.db_functions import (
+    insertRow, fetchRow, fetchRows, updateRow, deleteRow,
+    securePassword, checkPassword, git_update, checkUserAgent,
+    addTable, deleteTable, getTable, getTables, getColumns,
+    getLevels, getCategories, clean, clean2, ErrorsRestPlugin
+)
 from utils.secret import key
 
 from itertools import chain
@@ -117,7 +122,7 @@ def createUser(db):
         print(res)
         return template("static/templates/register.tpl", res=res)
 
-    password  = securePassword(plaintext)
+    password = securePassword(plaintext)
     create_time = datetime.now()
 
     # -- check if user exists
@@ -180,53 +185,6 @@ def dashboard(db):
 ###############################################################################
 #                            files Table Functions                            #
 ###############################################################################
-@app.route("/uploadFile", method="GET")
-def uploadFile():
-    if not request.get_cookie("user_id", secret=key):
-        redirect('/')
-    return template("static/templates/upload.tpl")
-
-@app.route("/uploadFile", method="POST")
-def uploadFile(db):
-    if not request.get_cookie("user_id", secret=key):
-        redirect('/')
-
-    user_id = str(request.get_cookie("user_id", secret=key))
-    upload  = request.files.get('upload')
-    file_name = upload.filename
-    name, ext = os.path.splitext(file_name)
-    if ext.lower() != ".pdf":
-        res = {
-            "message": f"file extension {ext} is not allowed"
-        }
-        return template("static/templates/delay.tpl", res=clean(res), location="/dashboard")
-
-    entry_time = datetime.now()
-    user_dir = Path(Path.cwd(), "pdf_files", user_id)
-    Path.mkdir(user_dir, exist_ok=True)
-    if user_dir.joinpath(file_name).exists():
-        res = {
-            "message": "file exists!",
-            "file": user_dir.joinpath(file_name)
-        }
-        return template("static/templates/delay.tpl", res=clean(res), location="/dashboard")
-
-    upload.save(user_dir.as_posix())
-    params = {
-        "table": "files",
-        "columns": ["user_id", "file_name", "entry_time"],
-        "col_values": [user_id, file_name, entry_time]
-    }
-    entry_id = insertRow(db, **params)
-
-    res = {
-        "message": "file uploaded",
-        "entry_id": entry_id
-    }
-    print(res)
-    return template("static/templates/delay.tpl", res=res, location="/dashboard")
-    # redirect("/dashboard")
-
 @app.route("/deleteFile", method="POST")
 def deleteFile(db):
     if not request.get_cookie("user_id", secret=key):
@@ -301,7 +259,6 @@ def processFile(db):
 
     dst_pdf = Path(Path.cwd(), "pdf_outgoing", "")
     # -- send file to [pdf_outgoing]
-?
 
     res = {
         "message": "processing file",
@@ -409,3 +366,57 @@ def send_css(filename):
 port = int(os.environ.get("PORT", 8080))
 run(app, host="0.0.0.0", port=port, reloader=True, debug=True)
 # run(app, host="0.0.0.0", port=port, reloader=True)
+
+###############################################################################
+#                                  Deprecated                                 #
+###############################################################################
+"""
+@app.route("/uploadFile", method="GET")
+def uploadFile():
+    if not request.get_cookie("user_id", secret=key):
+        redirect('/')
+    return template("static/templates/upload.tpl")
+
+@app.route("/uploadFile", method="POST")
+def uploadFile(db):
+    if not request.get_cookie("user_id", secret=key):
+        redirect('/')
+
+    user_id = str(request.get_cookie("user_id", secret=key))
+    upload  = request.files.get('upload')
+    file_name = upload.filename
+    name, ext = os.path.splitext(file_name)
+    if ext.lower() != ".pdf":
+        res = {
+            "message": f"file extension {ext} is not allowed"
+        }
+        return template("static/templates/delay.tpl", res=clean(res), location="/dashboard")
+
+    entry_time = datetime.now()
+    user_dir = Path(Path.cwd(), "pdf_files", user_id)
+    Path.mkdir(user_dir, exist_ok=True)
+    if user_dir.joinpath(file_name).exists():
+        res = {
+            "message": "file exists!",
+            "file": user_dir.joinpath(file_name)
+        }
+        return template("static/templates/delay.tpl", res=clean(res), location="/dashboard")
+
+    upload.save(user_dir.as_posix())
+    params = {
+        "table": "files",
+        "columns": ["user_id", "file_name", "entry_time"],
+        "col_values": [user_id, file_name, entry_time]
+    }
+    entry_id = insertRow(db, **params)
+
+    res = {
+        "message": "file uploaded",
+        "entry_id": entry_id
+    }
+    print(res)
+    return template("static/templates/delay.tpl", res=res, location="/dashboard")
+    # redirect("/dashboard")
+
+
+"""

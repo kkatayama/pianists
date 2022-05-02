@@ -413,75 +413,6 @@ def git_update():
         print(subprocess.Popen(cmd, cwd=Path.cwd().as_posix(), universal_newlines=False, shell=None))
 
 
-# Parsers #####################################################################
-def mapUrlPaths(url_paths, req_items, table=""):
-    dt = "NOT NULL DEFAULT (strftime('%Y-%m-%d %H:%M:%f', 'now', 'localtime'))"
-    r = re.compile(r"/", re.VERBOSE)
-    keys = map(str.lower, r.split(url_paths)[::2])
-    vals = map(str.upper, r.split(url_paths)[1::2])
-    url_params = dict(zip(keys, vals))
-
-    # -- process params
-    req_params = {k.lower():v.upper() for (k,v) in req_items.items()}
-    params = {**url_params, **req_params}
-
-    # -- order and build columns for CREATE statement
-    id_cols, time_cols, non_cols, rejects = ([] for i in range(4))
-    for (k, v) in params.items():
-        if re.match(r"([a-z_0-9]+_id)", k):
-            if (table == "users") or ("user" not in k):
-                id_cols.insert(0, f"{k} {v} PRIMARY KEY")
-            else:
-                id_cols.append(f"{k} {v} NOT NULL")
-        elif re.match(r"([a-z_0-9]+_time)", k):
-            time_cols.append(f"{k} {v} {dt}")
-        elif re.match(r"([a-z_0-9]+)", k):
-            non_cols.append(f"{k} {v} NOT NULL")
-        else:
-            reject.append({k: v})
-
-    columns = id_cols + non_cols + time_cols
-    print("__params__\n", params, "\n__columns__\n", columns)
-    return params, columns
-
-def parseURI(url_paths):
-    r = re.compile(r"/", re.VERBOSE)
-    url_split = r.split(url_paths)
-
-    if (len(url_split) % 2) == 0:
-        p = map(str, url_split)
-        url_params = dict(zip(p, p))
-    elif url_paths:
-        keys, values = ([] for i in range(2))
-        for i in range(0, len(url_split), 2):
-            if re.match(r"([a-z_]+)", url_split[i]):
-                keys.append(url_split[i])
-                values.append(url_split[i + 1])
-            else:
-                values[-1] = "/".join([values[-1], url_split[i]])
-        url_params = dict(zip(keys, values))
-    else:
-        url_params = {}
-
-    return url_params
-
-def parseUrlPaths(url_paths, req_items, columns, checkFilters=False):
-    # -- parse "params" and "filters" from url paths
-    url_params = parseURI(url_paths)
-
-    if checkFilters:
-        # -- process filters (pop from url_params if necessary)
-        url_filters = url_params.pop("filter") if url_params.get("filter") else ""
-        req_filters = req_items["filter"] if req_items.get("filter") else ""
-        filters = " AND ".join([f for f in [url_filters, req_filters] if f])
-    # -- process params
-    req_params = {k: v for (k, v) in req_items.items() if k in columns}
-    params = {**url_params, **req_params}
-
-    if checkFilters:
-        return params, filters
-    return params
-
 ###############################################################################
 #                               Tablee Functions                              #
 ###############################################################################
@@ -511,7 +442,7 @@ def deleteTable(db, query="", **kwargs):
         cur = db.execute(query)
     except (sqlite3.ProgrammingError, sqlite3.OperationalError) as e:
         print(e.args)
-        return {"Error": e.args, "query": query, "values": values, "kwargs": kwargs}
+        return {"Error": e.args, "query": query, "kwargs": kwargs}
     return {"message": f"{abs(cur.rowcount)} table deleted!"}
 
 def getTable(db, tables=[], table_name=''):
@@ -668,3 +599,77 @@ class ErrorsRestPlugin(object):
     def apply(self, callback, route):
         """Execute Handler"""
         return callback
+
+###########################################################################
+#                                Deprecated                               #
+###########################################################################
+"""
+# Parsers #####################################################################
+def mapUrlPaths(url_paths, req_items, table=""):
+    dt = "NOT NULL DEFAULT (strftime('%Y-%m-%d %H:%M:%f', 'now', 'localtime'))"
+    r = re.compile(r"/", re.VERBOSE)
+    keys = map(str.lower, r.split(url_paths)[::2])
+    vals = map(str.upper, r.split(url_paths)[1::2])
+    url_params = dict(zip(keys, vals))
+
+    # -- process params
+    req_params = {k.lower():v.upper() for (k,v) in req_items.items()}
+    params = {**url_params, **req_params}
+
+    # -- order and build columns for CREATE statement
+    id_cols, time_cols, non_cols, rejects = ([] for i in range(4))
+    for (k, v) in params.items():
+        if re.match(r"([a-z_0-9]+_id)", k):
+            if (table == "users") or ("user" not in k):
+                id_cols.insert(0, f"{k} {v} PRIMARY KEY")
+            else:
+                id_cols.append(f"{k} {v} NOT NULL")
+        elif re.match(r"([a-z_0-9]+_time)", k):
+            time_cols.append(f"{k} {v} {dt}")
+        elif re.match(r"([a-z_0-9]+)", k):
+            non_cols.append(f"{k} {v} NOT NULL")
+        else:
+            reject.append({k: v})
+
+    columns = id_cols + non_cols + time_cols
+    print("__params__\n", params, "\n__columns__\n", columns)
+    return params, columns
+
+def parseURI(url_paths):
+    r = re.compile(r"/", re.VERBOSE)
+    url_split = r.split(url_paths)
+
+    if (len(url_split) % 2) == 0:
+        p = map(str, url_split)
+        url_params = dict(zip(p, p))
+    elif url_paths:
+        keys, values = ([] for i in range(2))
+        for i in range(0, len(url_split), 2):
+            if re.match(r"([a-z_]+)", url_split[i]):
+                keys.append(url_split[i])
+                values.append(url_split[i + 1])
+            else:
+                values[-1] = "/".join([values[-1], url_split[i]])
+        url_params = dict(zip(keys, values))
+    else:
+        url_params = {}
+
+    return url_params
+
+def parseUrlPaths(url_paths, req_items, columns, checkFilters=False):
+    # -- parse "params" and "filters" from url paths
+    url_params = parseURI(url_paths)
+
+    if checkFilters:
+        # -- process filters (pop from url_params if necessary)
+        url_filters = url_params.pop("filter") if url_params.get("filter") else ""
+        req_filters = req_items["filter"] if req_items.get("filter") else ""
+        filters = " AND ".join([f for f in [url_filters, req_filters] if f])
+    # -- process params
+    req_params = {k: v for (k, v) in req_items.items() if k in columns}
+    params = {**url_params, **req_params}
+
+    if checkFilters:
+        return params, filters
+    return params
+"""
