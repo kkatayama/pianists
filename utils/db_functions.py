@@ -454,6 +454,8 @@ def git_update():
     cmds = (
         ["git", "add", "-A"],
         ["git", "commit", "-am", "db_sync"],
+        ["git", "push"],
+        ["git", "commit", "-a"],
         ["git", "push"]
     )
     for cmd in cmds:
