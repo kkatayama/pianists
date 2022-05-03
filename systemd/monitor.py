@@ -25,10 +25,10 @@ def progress4(filename, size, sent, peername):
     sys.stdout.write("(%s:%s) %s\'s progress: %.2f%%   \r" % (peername[0], peername[1], filename, float(sent)/float(size)*100))
 
 class MonitorChanges(PatternMatchingEventHandler):
-    def on_modified(self, event):
+    def on_created(self, event):
         if ".pdf" in event.src_path:
             pdf_file = Path(event.src_path)
-            logging.info(f'PDF Item Modified: "SCP to Server"')
+            logging.info(f'PDF Item Created: "SCP to Server"')
             logging.info(event)
             time.sleep(4)
 
