@@ -13,22 +13,22 @@ class MonitorChanges(PatternMatchingEventHandler):
     #     pass
     #     log.debug(event)
 
-    def on_moved(self, event):
-        # if ".db" in event.src_path:
-        #     log.warn(f'DB Moved???: "Updating GitHub"')
-        #     # self.git_update()
-        return
+    # def on_moved(self, event):
+    #     # if ".db" in event.src_path:
+    #     #     log.warn(f'DB Moved???: "Updating GitHub"')
+    #     #     # self.git_update()
+    #     return
 
-    def on_created(self, event):
-        if ".pdf" in event.src_path:
-            logging.info(f'PDF Item Created: "SCP to Server"')
-            logging.info(event)
+    # def on_created(self, event):
+    #     if ".pdf" in event.src_path:
+    #         logging.info(f'PDF Item Created: "SCP to Server"')
+    #         logging.info(event)
 
-    def on_deleted(self, event):
-        # if ".db" in event.src_path:
-        #     log.info(f'DB Item Deleted: "Updating GitHub"')
-        #     # self.git_update()
-        return
+    # def on_deleted(self, event):
+    #     # if ".db" in event.src_path:
+    #     #     log.info(f'DB Item Deleted: "Updating GitHub"')
+    #     #     # self.git_update()
+    #     return
 
     def on_modified(self, event):
         if ".pdf" in event.src_path:
