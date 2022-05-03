@@ -53,7 +53,7 @@
               % end
             </div>
           </div>
-          <input type="submit" class="submit" value="Search Piano Sheet Music" />
+          <input type="submit" class="submit" name="webapp" value="Search Piano Sheet Music" />
         </form>
       </div>
       <div class="below">
@@ -87,7 +87,7 @@
             </tbody>
           </table>
           % if len(rows):
-            <input type="submit" class="submit" value="Download Selected Sheet Music" />
+            <input type="submit" class="submit" name="webapp" value="Download Selected Sheet Music" />
           % end
         </form>
         % end

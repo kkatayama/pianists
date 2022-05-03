@@ -4,10 +4,10 @@ from bottle_sqlite import SQLitePlugin, sqlite3
 from utils.db_functions import (
     insertRow, fetchRow, fetchRows, deleteRow,
     securePassword, checkPassword, git_update,
-    getLevels, getCategories, clean,
-    log_to_logger, ErrorsRestPlugin
+    getLevels, getCategories, clean, parseParams, genToken,
+    checkUserAgent, log_to_logger, ErrorsRestPlugin
 )
-from utils.secret import key
+from utils.secret import secret_key
 
 from itertools import chain
 from datetime import datetime
@@ -32,12 +32,22 @@ app.install(log_to_logger)
 app.install(ErrorsRestPlugin())
 
 
+@app.hook("before_request")
+def getParams():
+    parseParams(secret_key)
+
 @app.route("/commands", method=["GET", "POST", "PUT", "DELETE", "OPTIONS"])
 def commands():
     with open('docs/all_commands.json') as f:
         res = json.load(f)
-    print(res)
     return res
+
+
+@app.route("/test", method=["GET", "POST"])
+def test():
+    # parseParams(secret_key)
+    res = {"PARAMS": request.params, "JSON": request.json, "COOKIES": request.cookies}
+    return clean(res)
 
 ###############################################################################
 #                            Users Table Functions                            #
@@ -45,55 +55,44 @@ def commands():
 @app.route("/", method="GET")
 @app.route("/login", method=["GET"])
 def index():
-    return template("static/templates/index.tpl")
+    if request.params.get('webapp'):
+        return template("static/templates/index.tpl")
+    return clean({"message": "index/login", "request": request.url})
 
 @app.route("/login", method="POST")
 def login(db):
     try:
-        username = request.POST["username"]
-        password = request.POST["password"]
+        username = request.params["username"]
+        password = request.params["password"]
     except KeyError:
-        res = {
-            "message": "missing paramater",
-            "required params": ["username", "password"]
-        }
-        print(res)
-        return template("static/templates/index.tpl", res=res)
+        res = {"message": "missing paramater", "required params": ["username", "password"]}
+        if request.params.get('webapp'):
+            return template("static/templates/index.tpl", res=res)
+        return clean(res)
 
     # -- check if user exists
-    params = {
-        "table": "users",
-        "where": "username=?",
-        "values": username
-    }
-    row = fetchRow(db, **params)
+    row = fetchRow(db, table="users", where="username=?", values=username)
     if not row:
-        res = {
-            "message": "user does not exist",
-            "username": username
-        }
-        print(res)
-        return template("static/templates/index.tpl", res=res)
+        res = {"message": "user does not exist", "username": username}
+        if request.params.get('webapp'):
+            return template("static/templates/index.tpl", res=res)
+        return clean(res)
 
     # -- check user supplied password (previous row statement has user data for username=[username])
     if not checkPassword(password, row["password"]):
         # -- checkPassword() returned False
-        res = {
-            "message": "incorrect password",
-            "password": password
-        }
-        print(res)
-        return template("static/templates/index.tpl", res=res)
+        res = {"message": "incorrect password", "password": password}
+        if request.params.get('webapp'):
+            return template("static/templates/index.tpl", res=res)
+        return clean(res)
 
     # -- made it here: means username exists and checkPassword() returned True
-    response.set_cookie("user_id", row["user_id"], secret=key)
-    res = {
-        "message": "user login success",
-        "user_id": row["user_id"],
-        "username": row["username"]
-    }
-    print(res)
-    return template("static/templates/delay.tpl", res=res, location="/dashboard")
+    response.set_cookie("user_id", str(row["user_id"]), secret=secret_key)
+    res = {"message": "user login success", "user_id": row["user_id"], "username": row["username"]}
+    res.update({"token": genToken("user_id", str(row["user_id"]), secret_key)})
+    if request.params.get('webapp'):
+        return template("static/templates/delay.tpl", res=res, location="/dashboard")
+    return clean(res)
 
 @app.route("/register", method="GET")
 def register():
@@ -103,110 +102,74 @@ def register():
 @app.route("/createUser", method="POST")
 def createUser(db):
     try:
-        username = request.POST["username"]
-        plaintext = request.POST["password"]
-        password2 = request.POST["password2"]
+        username = request.params["username"]
+        plaintext = request.params["password"]
+        password2 = request.params["password2"]
     except KeyError:
-        res = {
-            "message": "missing paramater",
-            "required params": ["username", "password", "password2"]
-        }
-        print(res)
-        return template("static/templates/register.tpl", res=res)
+        res = {"message": "missing paramater", "required params": ["username", "password", "password2"]}
+        if request.params.get('webapp'):
+            return template("static/templates/register.tpl", res=res)
+        return clean(res)
 
     if plaintext != password2:
-        res = {
-            "message": "passwords do not match",
-            "password1": plaintext,
-            "password2": password2
-        }
-        print(res)
-        return template("static/templates/register.tpl", res=res)
-
-    password = securePassword(plaintext)
-    create_time = datetime.now()
+        res = {"message": "passwords do not match", "password1": plaintext, "password2": password2}
+        if request.params.get('webapp'):
+            return template("static/templates/register.tpl", res=res)
+        return clean(res)
 
     # -- check if user exists
-    params = {
-        "table": "users",
-        "where": "username=?",
-        "values": username
-    }
-    row = fetchRow(db, **params)
+    row = fetchRow(db, table="users", where="username=?", values=username)
     if row:
-        res = {
-            "message": "user exists",
-            "username": row["username"]
-        }
-        print(res)
-        return template("static/templates/register.tpl", res=res)
+        res = {"message": "user exists", "username": row["username"]}
+        if request.params.get('webapp'):
+            return template("static/templates/register.tpl", res=res)
+        return clean(res)
 
     # -- if user doesn't exist, create user
-    params = {
-        "table": "users",
-        "columns": ["username", "password", "create_time"],
-        "col_values": [username, password, create_time],
-    }
-    user_id = insertRow(db, **params)
-
-    res = {
-        "message": "user created",
-        "user_id": user_id,
-        "username": username
-    }
-    print(res)
-    return template("static/templates/index.tpl", res=res)
+    password = securePassword(plaintext)
+    user_id = insertRow(db, table="users", columns=["username", "password"], col_values=[username, password])
+    res = {"message": "user created", "user_id": user_id, "username": username}
+    res.update({"token": genToken("user_id", str(user_id), secret_key)})
+    if request.params.get('webapp'):
+        return template("static/templates/index.tpl", res=res)
+    return clean(res)
 
 @app.route('/logout', method="GET")
 def logout():
-    res = {
-        "message": "user logged out"
-    }
-    print(res)
-    response.delete_cookie('user_id')
-    redirect('/')
+    res = {"message": "user logged out"}
+    if request.params.get('webapp'):
+        response.delete_cookie('user_id')
+        redirect('/')
+    return clean(res)
 
 @app.route('/dashboard', method="GET")
 def dashboard(db):
-    if not request.get_cookie("user_id", secret=key):
+    user_id = request.get_cookie("user_id", secret=secret_key)
+    if not user_id:
         redirect('/')
 
-    user_id = str(request.get_cookie("user_id", secret=key))
-    params = {
-        "table": "files",
-        "where": "user_id=?",
-        "values": user_id
-    }
-    rows = fetchRows(db, **params)
-    if rows:
-        return template("static/templates/dashboard.tpl", rows=rows)
-    return template("static/templates/dashboard.tpl")
-
-
+    rows = fetchRows(db, table="files", where="user_id=?", values=user_id)
+    if request.params.get("webapp"):
+        if rows:
+            return template("static/templates/dashboard.tpl", rows=rows)
+        return template("static/templates/dashboard.tpl")
+    return clean({"message": "user_dashboard", "files": rows})
 ###############################################################################
 #                            files Table Functions                            #
 ###############################################################################
 @app.route("/deleteFile", method="POST")
 def deleteFile(db):
-    if not request.get_cookie("user_id", secret=key):
+    user_id = request.get_cookie("user_id", secret=secret_key)
+    if not user_id:
         redirect('/')
-    user_id = str(request.get_cookie("user_id", secret=key))
-    entry_id = str(request.POST.get("entry_id"))
-    params = {
-        "table": "files",
-        "where": "user_id=? AND entry_id=?",
-        "values": [user_id, entry_id],
-    }
-    row = fetchRow(db, **params)
 
+    entry_id = str(request.params.get("entry_id"))
+    row = fetchRow(db, table="files", where="user_id=? AND entry_id=?", values=[user_id, entry_id])
     if not row:
-        res = {
-            "message": "no file with matching 'entry_id' and 'user_id'",
-            "user_id": user_id,
-            "entry_id": entry_id
-        }
-        print(res)
-        return template("static/templates/delay.tpl", res=res, location="/dashboard")
+        res = {"message": "no file with matching 'entry_id' and 'user_id'", "user_id": user_id, "entry_id": entry_id}
+        if request.params.get("webapp"):
+            return template("static/templates/delay.tpl", res=res, location="/dashboard")
+        return clean(res)
 
     # -- file found and belongs to user
     file_name = row["file_name"]
@@ -218,66 +181,52 @@ def deleteFile(db):
         user_pdf.unlink()
 
     # -- delete from database
-    params = {
-        "table": "files",
-        "where": "user_id=? AND entry_id=?",
-        "values": [user_id, entry_id]
-    }
-    num_deletes = deleteRow(db, **params)
-    res = {
-        "message": f"{num_deletes} file deleted",
-        "file": user_pdf.as_posix()
-    }
-    print(res)
-    return template("static/templates/delay.tpl", res=res, location="/dashboard")
+    num_deletes = deleteRow(db, table="files", where="user_id=? AND entry_id=?", values=[user_id, entry_id])
+    res = {"message": f"{num_deletes} file deleted", "file": user_pdf.as_posix()}
+    if request.params.get("webapp"):
+        return template("static/templates/delay.tpl", res=res, location="/dashboard")
+    return clean(res)
 
 @app.route('/processFile', method="POST")
 def processFile(db):
-    if not request.get_cookie("user_id", secret=key):
+    user_id = request.get_cookie("user_id", secret=secret_key)
+    if not user_id:
         redirect('/')
-    user_id = str(request.get_cookie("user_id", secret=key))
-    entry_id = str(request.POST.get("entry_id"))
-    params = {
-        "table": "files",
-        "where": "user_id=? AND entry_id=?",
-        "values": [user_id, entry_id],
-    }
-    row = fetchRow(db, **params)
 
+    entry_id = str(request.POST.get("entry_id"))
+    row = fetchRow(db, table="files", where="user_id=? AND entry_id=?", values=[user_id, entry_id])
     if not row:
-        res = {
-            "message": "no file with matching 'entry_id' and 'user_id'",
-            "user_id": user_id,
-            "entry_id": entry_id
-        }
-        print(res)
-        return template("static/templates/delay.tpl", res=res, location="/dashboard")
+        res = {"message": "no file with matching 'entry_id' and 'user_id'", "user_id": user_id, "entry_id": entry_id}
+        if request.params.get("webapp"):
+            return template("static/templates/delay.tpl", res=res, location="/dashboard")
+        return clean(res)
 
     # -- file found and belongs to user
     file_name = row["file_name"]
     user_dir = Path(Path.cwd(), "pdf_files", user_id)
-    user_pdf = Path(user_dir, file_name).as_posix()
-
-    dst_pdf = Path(Path.cwd(), "pdf_outgoing", "")
+    user_pdf = str(Path(user_dir, file_name))
+    dst_pdf = str(Path(Path.cwd(), "pdf_outgoing", "temp.pdf"))
+    shutil.copy(user_pdf, dst_pdf)
     # -- send file to [pdf_outgoing]
 
-    res = {
-        "message": "processing file",
-        "file": user_pdf
-    }
-    print(res)
-    return template("static/templates/delay.tpl", res=res, location="/dashboard")
+    res = {"message": "processing file", "file": user_pdf}
+    if request.params.get("webapp"):
+        return template("static/templates/delay.tpl", res=res, location="/dashboard")
+    return clean(res)
 
 @app.route("/search", method=["GET", "POST"])
 def search(db):
-    print(f'params = {request.params}')
-    if not request.get_cookie("user_id", secret=key):
+    user_id = request.get_cookie("user_id", secret=secret_key)
+    if not user_id:
         redirect('/')
-    if not request.params:
+    if (len(request.params) == 1) and (request.params.get("webapp")):
         return template("static/templates/search.tpl",
                         user_values={}, levels=getLevels(db), categories=getCategories(db))
+    if (len(request.params) == 2) and (not request.params.get("webapp")):
+        levels = {"level" + str(i + 1): d["level"] for i, d in enumerate(getLevels(db))}
+        categories = {"category" + str(i + 1): d["category"] for i, d in enumerate(getCategories(db))}
+        return clean({"message": "search", "levels": levels, "categories": categories})
 
-    user_id = str(request.get_cookie("user_id", secret=key))
     query = {}
     user_values = {}
     if request.params.get("title"):
@@ -296,18 +245,22 @@ def search(db):
     rows = fetchRows(db, table="mmf", where=conditions, values=values)
     if not rows:
         rows = {}
-    print(rows)
-    return template("static/templates/search.tpl",
-                    user_values=user_values, query=query,
-                    levels=getLevels(db), categories=getCategories(db), rows=rows)
+    if request.params.get("webapp"):
+        return template("static/templates/search.tpl",
+                        user_values=user_values, query=query,
+                        levels=getLevels(db), categories=getCategories(db), rows=rows)
+    return clean({"message": "search results", "files": rows})
 
 @app.route("/downloadFile", method=["GET", "POST"])
 def downloadFile(db):
-    if not request.get_cookie("user_id", secret=key):
+    user_id = request.get_cookie("user_id", secret=secret_key)
+    if not user_id:
         redirect('/')
     if not request.params.get("entry_id"):
-        return template("static/templates/delay.tpl", res={"message": "missing 'entry_id'"}, location="/dashboard")
-    user_id = str(request.get_cookie("user_id", secret=key))
+        if request.params.get("webapp"):
+            return template("static/templates/delay.tpl", res={"message": "missing 'entry_id'"}, location="/dashboard")
+        return clean({"message": "missing 'entry_id'"})
+
     mmf_entry_id = str(request.params.get("entry_id"))
     mmf_file = fetchRow(db, table="mmf", where="entry_id = ?", values=[mmf_entry_id])
     print(f"mmf_file = {mmf_file}")
@@ -327,7 +280,9 @@ def downloadFile(db):
             "title": title,
             "file": user_dir.joinpath(file_name)
         }
-        return template("static/templates/delay.tpl", res=clean(res), location="/dashboard")
+        if request.params.get("webapp"):
+            return template("static/templates/delay.tpl", res=clean(res), location="/dashboard")
+        return clean(res)
 
     # -- download (copy) file
     src_file = str(Path(Path.cwd(), "lib/making_music_fun", mmf_file["pdf_file"]))
@@ -347,8 +302,9 @@ def downloadFile(db):
         "message": "file downloaded",
         "entry_id": entry_id
     }
-    print(res)
-    return template("static/templates/delay.tpl", res=res, location="/dashboard")
+    if request.params.get("webapp"):
+        return template("static/templates/delay.tpl", res=res, location="/dashboard")
+    return clean(res)
     # redirect("/dashboard")
 
 
@@ -374,16 +330,16 @@ run(app, host="0.0.0.0", port=port, reloader=True)
 """
 @app.route("/uploadFile", method="GET")
 def uploadFile():
-    if not request.get_cookie("user_id", secret=key):
+    if not request.get_cookie("user_id", secret=secret_key):
         redirect('/')
     return template("static/templates/upload.tpl")
 
 @app.route("/uploadFile", method="POST")
 def uploadFile(db):
-    if not request.get_cookie("user_id", secret=key):
+    if not request.get_cookie("user_id", secret=secret_key):
         redirect('/')
 
-    user_id = str(request.get_cookie("user_id", secret=key))
+    user_id = str(request.get_cookie("user_id", secret=secret_key))
     upload  = request.files.get('upload')
     file_name = upload.filename
     name, ext = os.path.splitext(file_name)

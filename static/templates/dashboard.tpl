@@ -42,8 +42,8 @@
           </table>
       </div>
       <div class="below">
-        <input type="submit" class="submit" formaction="/deleteFile" value="Delete File" />
-        <input type="submit" class="submit" formaction="/processFile" value="Process File" />
+        <input type="submit" class="submit" formaction="/deleteFile" name="webapp" value="Delete File" />
+        <input type="submit" class="submit" formaction="/processFile" name="webapp" value="Process File" />
         <a href="/search" class="submit">Find Sheet Music</a>
         <a href="/logout" class="submit">Log Out</a>
         </form>

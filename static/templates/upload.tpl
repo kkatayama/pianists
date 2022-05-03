@@ -19,7 +19,7 @@
           <div class="divTableFoot tableFootStyle">
             <div class="divTableRow">
               <div class="divTableCell">
-                <input type="submit" formaction="/uploadFile" value="Upload File" />
+                <input type="submit" formaction="/uploadFile" name="webapp" value="Upload File" />
               </div>
             </div>
           </div>

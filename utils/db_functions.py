@@ -15,8 +15,10 @@ All functions support a full SQL [query] or a python [dict]
 # -- checkPassword()    - check if password matches
 # -- clean()            - sanitize data for json delivery
 """
-from bottle import request, response, FormsDict, json_dumps, JSONPlugin
+from bottle import request, response, FormsDict, WSGIHeaderDict, json_dumps, JSONPlugin, cookie_decode, cookie_encode
 from datetime import datetime
+from base64 import b64decode, b64encode
+
 # from rich.markup import escape
 # from rich import inspect
 # from rich import print
@@ -77,7 +79,9 @@ def insertRow(db, query="", **kwargs):
         columns = kwargs["columns"]
         col_values = kwargs["col_values"]
         query = f"INSERT INTO {table} ({','.join(columns)}) VALUES ({', '.join(['?']*len(columns))});"
-    print(query, col_values) if col_values else print(query)
+    clean2({"query": query})
+    if col_values:
+        clean2({"col_values": col_values})
 
     try:
         cur = db.execute(query, col_values) if col_values else db.execute(query)
@@ -95,7 +99,7 @@ def insertRow(db, query="", **kwargs):
             },
             'SQLite Traceback': tb_msgs
         }
-        print(err)
+        clean2(err)
         return err
 
     return cur.lastrowid
@@ -147,7 +151,9 @@ def fetchRow(db, query="", **kwargs):
         condition = "1" if not kwargs.get("where") else f'{kwargs["where"]}'
         values = [kwargs.get("values")] if isinstance(kwargs.get("values"), str) else kwargs.get("values")
         query = f"SELECT {columns} FROM {table} WHERE {condition};"
-    print(query, values) if values else print(query)
+    clean2({"query": query})
+    if values:
+        clean2({"values": values})
 
     try:
         row = db.execute(query, values).fetchone() if values else db.execute(query).fetchone()
@@ -165,7 +171,7 @@ def fetchRow(db, query="", **kwargs):
             },
             'SQLite Traceback': tb_msgs
         }
-        print(err)
+        clean2(err)
         return err
 
     if row:
@@ -215,7 +221,9 @@ def fetchRows(db, query="", **kwargs):
         condition = "1" if not kwargs.get("where") else f'{kwargs["where"]}'
         values = [kwargs.get("values")] if isinstance(kwargs.get("values"), str) else kwargs.get("values")
         query = f"SELECT {columns} FROM {table} WHERE {condition};"
-    print(query, values) if values else print(query)
+    clean2({"query": query})
+    if values:
+        clean2({"values": values})
 
     try:
         rows = db.execute(query, values).fetchall() if values else db.execute(query).fetchall()
@@ -233,7 +241,7 @@ def fetchRows(db, query="", **kwargs):
             },
             'SQLite Traceback': tb_msgs
         }
-        print(err)
+        clean2(err)
         return err
 
     if rows:
@@ -294,7 +302,9 @@ def updateRow(db, query="", **kwargs):
         condition = f'({kwargs["where"]})'
         values = [kwargs["values"]] if isinstance(kwargs["values"], str) else kwargs["values"]
         query = f"UPDATE {table} SET {columns} WHERE {condition};"
-    print(query, col_values, values) if (col_values and values) else print(query)
+    clean2({"query": query})
+    if (col_values and values):
+        clean2({"col_values": col_values, "values": values})
 
     try:
         cur = db.execute(query, col_values+values) if (col_values and values) else db.execute(query)
@@ -315,7 +325,7 @@ def updateRow(db, query="", **kwargs):
             },
             'SQLite Traceback': tb_msgs
         }
-        print(err)
+        clean2(err)
         return err
 
     return cur.rowcount
@@ -363,7 +373,9 @@ def deleteRow(db, query="", **kwargs):
         condition = f'({kwargs["where"]})'
         values = [kwargs["values"]] if isinstance(kwargs["values"], str) else kwargs["values"]
         query = f"DELETE FROM {table} WHERE {condition};"
-    print(query, values) if values else print(query)
+    clean2({"query": query})
+    if values:
+        clean2({"values": values})
 
     try:
         cur = db.execute(query, values)
@@ -383,12 +395,36 @@ def deleteRow(db, query="", **kwargs):
             },
             'SQLite Traceback': tb_msgs
         }
-        print(err)
+        clean2(err)
         return err
 
     return cur.rowcount
 
-# Helper Functions ############################################################
+
+###############################################################################
+#                               Table Functions                               #
+###############################################################################
+def getLevels(db):
+    args = {
+        "table": 'mmf',
+        "columns": ["level"],
+        "where": "? GROUP BY level",
+        "values": ['1']
+    }
+    return fetchRows(db, **args)
+
+def getCategories(db):
+    args = {
+        "table": 'mmf',
+        "columns": ["category"],
+        "where": "? GROUP BY category",
+        "values": ['1']
+    }
+    return fetchRows(db, **args)
+
+###############################################################################
+#                                App Functions                                #
+###############################################################################
 def securePassword(plaintext):
     salt = os.urandom(32)
     digest = hashlib.pbkdf2_hmac("sha256", plaintext.encode(), salt, 1000)
@@ -414,30 +450,54 @@ def git_update():
         ["git", "push", "--porcelain", "origin"],
     )
     for cmd in cmds:
-        print(subprocess.Popen(cmd, cwd=Path.cwd().as_posix(), universal_newlines=False, shell=None))
+        logger.info(subprocess.Popen(cmd, cwd=Path.cwd().as_posix(), universal_newlines=False, shell=None))
 
+def parseParams(secret_key):
+    params = {}
+    if request.json:
+        params.update(request.json)
+    r_key = ""
+    for k in request.params.keys():
+        if (("{" in k) and ("}" in k)):
+            try:
+                params.update(json.loads(k))
+                r_key = k
+            except Exception:
+                logger.error(f'ERROR: k = {k}')
+    if r_key:
+        try:
+            request.params.pop(r_key)
+        except Exception:
+            logger.error(f'ERROR: r_key = {r_key}')
+    request.params.update(params)
+    for k, v in request.params.items():
+        if k == "token":
+            try:
+                cookie_info = dict([cookie_decode(b64decode(v), secret_key)])
+                for kk, vv in cookie_info.items():
+                    request.cookies.update({kk: b64decode(v).decode()})
+                # request.headers.update({"Cookie": f'user_id="{b64decode(v)}"'})
+            except Exception:
+                logger.error(f'ERROR: {k} = {v}')
 
+    if request.params.get('token'):
+        request.params.update({"webapp": False})
+    elif ((not request.params.get('token')) and (not request.params.get("webapp"))):
+        if checkUserAgent():
+            request.params.update({"webapp": True})
+        else:
+            request.params.update({"webapp": False})
+    else:
+        request.params.update({"webapp": True})
+    # clean({"req.params": request.params})
+    # clean({"req.cookies": request.cookies})
+    # clean({"req.headers": request.headers})
+
+def genToken(name, value, secret_key):
+    return b64encode(cookie_encode((name, value), secret_key)).decode()
 ###############################################################################
-#                               Tablee Functions                              #
+#                               Output Functions                              #
 ###############################################################################
-def getLevels(db):
-    args = {
-        "table": 'mmf',
-        "columns": ["level"],
-        "where": "? GROUP BY level",
-        "values": ['1']
-    }
-    return fetchRows(db, **args)
-
-def getCategories(db):
-    args = {
-        "table": 'mmf',
-        "columns": ["category"],
-        "where": "? GROUP BY category",
-        "values": ['1']
-    }
-    return fetchRows(db, **args)
-
 def checkUserAgent():
     user_agent = request.environ["HTTP_USER_AGENT"] if request.environ.get("HTTP_USER_AGENT") else ""
     browser_agents = [
@@ -463,18 +523,18 @@ def checkUserAgent():
 def clean(data):
     if isinstance(data, dict):
         for k, v in data.items():
-            if isinstance(v, FormsDict):
+            if isinstance(v, FormsDict) or isinstance(v, WSGIHeaderDict):
                 data.update({k: dict(v)})
 
     str_data = json.dumps(data, default=str, indent=2)
     cleaned = json.loads(str_data)
-    print(cleaned)
+    # logger.info(cleaned)
     return cleaned
 
 def clean2(data):
     if isinstance(data, dict):
         for k, v in data.items():
-            if isinstance(v, FormsDict):
+            if isinstance(v, FormsDict) or isinstance(v, WSGIHeaderDict):
                 data.update({k: dict(v)})
 
     str_data = json.dumps(data, default=str, indent=2)
@@ -482,7 +542,7 @@ def clean2(data):
     #     return template("templates/prettify.tpl", data=str_data)
 
     # cleaned = json.loads(str_data)
-    print(str_data)
+    logger.error(str_data)
     return str_data
 
 # Logging #####################################################################
@@ -516,11 +576,12 @@ def log_to_logger(fn):
 
         if isinstance(actual_response, dict):
             if not actual_response.get("message") == "available commands":
-                logger.info(json.dumps({"request.params": dict(request.params)}))
+                logger.info(json.dumps({"request.params": dict(request.params)}, indent=2))
                 logger.info(json.dumps(actual_response, default=str, indent=2))
         else:
             # logger.info(json.dumps(actual_response, default=str, indent=2))
             # logger.info(json.dumps({'msg': }, default=str, indent=2))
+            logger.info(json.dumps({"request.params": dict(request.params)}))
             logger.info(actual_response)
         return actual_response
     return _log_to_logger

@@ -33,7 +33,7 @@
           <div class="divTableFoot tableFootStyle">
             <div class="divTableRow">
               <div class="divTableCell">
-                <div class="divTableCellLeft"><input type="submit" value="Login" /></div>
+                <div class="divTableCellLeft"><input type="submit" name="webapp" value="Login" /></div>
                 <div class="divTableCellRight"><a href="/register">Register</a></div>
               </div>
             </div>
