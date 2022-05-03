@@ -14,7 +14,7 @@ import sys
 
 host = {
     "ip": "192.168.1.95",
-    "port": "22",
+    "port": 22,
     "username": "katayama",
     "remote_path": "/Users/katayama/temp/incoming"
 }
@@ -35,7 +35,7 @@ class MonitorChanges(PatternMatchingEventHandler):
             logging.info(f'Sending File: {pdf_file}')
             with SSHClient() as ssh:
                 ssh.load_system_host_keys()
-                ssh.connect(hostname=host['ip'], port=host['port'], username=host['username'])
+                logging.info(ssh.connect(hostname=host['ip'], port=host['port'], username=host['username']))
                 with SCPClient(ssh.get_transport(), progress4=progress4) as scp:
                     logging.info(scp.put(files=str(pdf_file), remote_path=host['remote_path'], recursive=False))
 
