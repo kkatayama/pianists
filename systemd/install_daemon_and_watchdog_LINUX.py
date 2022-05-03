@@ -24,13 +24,6 @@ from rich import print
 py_file = Path(__file__).parent.absolute()
 pwd = py_file.parent
 
-"""
-repo = git.Repo(Path.cwd().joinpath('.git').as_posix())
-repo.git.add('--all')
-repo.git.commit('-m', 'commit test', author='katayama@udel.edu')
-origin = repo.remote(name="main")
-origin.push()
-"""
 
 # Extract Current User Info Running This Script ###############################
 user = os.environ.get("USER")
