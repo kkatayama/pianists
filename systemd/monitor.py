@@ -6,7 +6,6 @@ from pathlib import Path
 import logging
 import time
 import sys
-import git
 
 
 class MonitorChanges(PatternMatchingEventHandler):
@@ -33,25 +32,9 @@ class MonitorChanges(PatternMatchingEventHandler):
         return
 
     def on_modified(self, event):
-        if ".db" in event.src_path:
-            logging.info(f'DB Item Modified: "Updating GitHub"')
-
-            repo = git.Repo(Path.cwd().joinpath('.git').as_posix())
-            logging.info("marking git repo...")
-            time.sleep(5)
-
-            repo.git.add('--all')
-            logging.info("git add -A")
-            time.sleep(4)
-
-            repo.git.commit('-am', 'sync db changes', author='katayama@udel.edu')
-            logging.info("git commit -am")
-            time.sleep(4)
-
-            origin = repo.remote(name="origin")
-            origin.push()
-            logging.info("git push")
-            time.sleep(3)
+        if ".pdf" in event.src_path:
+            logging.info(f'PDF Item Modified: "SCP to Server"')
+            logging.info(event)
 
 
 if __name__ == '__main__':
@@ -59,10 +42,10 @@ if __name__ == '__main__':
     # log = getLogger()
     logging.basicConfig(level=logging.INFO)
 
-    event_handler = MonitorChanges(patterns=["*.db", "*.pdf"], ignore_patterns=["*.py"], ignore_directories=True)
+    event_handler = MonitorChanges(patterns=["*.pdf"], ignore_patterns=["*.py", "*.db"], ignore_directories=True)
     observer = Observer()
     # -- observer.daemon=True
-    observer.schedule(event_handler, Path.cwd().as_posix(), recursive=True)
+    observer.schedule(event_handler, Path.cwd().join_path("pdf_outgoing").as_posix(), recursive=True)
     observer.start()
     try:
         while True:
