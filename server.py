@@ -296,10 +296,11 @@ def downloadFile(db):
         "columns": ["user_id", "title", "file_name", "level", "category", "entry_time"],
         "col_values": [user_id, title, file_name, level, category, entry_time]
     }
-    entry_id = insertRow(db, **params)
+    entry_id = str(insertRow(db, **params))
 
     res = {
         "message": "file downloaded",
+        "mmf_entry_id": mmf_entry_id,
         "entry_id": entry_id
     }
     if request.params.get("webapp"):
@@ -318,6 +319,7 @@ def send_css(filename):
     print(f'filename: {filename}')
     print(f'sending: {filename}')
     return static_file(filename, root=f'{dirname}/static/css')
+
 
 # -- Run Web Server
 port = int(os.environ.get("PORT", 8080))
