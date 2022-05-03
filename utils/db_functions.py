@@ -450,7 +450,10 @@ def git_update():
         ["git", "push", "--porcelain", "origin"],
     )
     for cmd in cmds:
-        print(subprocess.Popen(cmd, cwd=Path.cwd().as_posix(), universal_newlines=False, shell=None))
+        # print(subprocess.Popen(cmd, cwd=Path.cwd().as_posix(), universal_newlines=False, shell=None))
+        print(' '.join(cmd))
+        out = subprocess.run(' '.join(cmd), cwd=Path.cwd().as_posix(), shell=True, capture_output=True, text=True).stdout.strip()
+        print(out)
 
 def parseParams(secret_key):
     params = {}
