@@ -38,6 +38,10 @@ class MonitorChanges(PatternMatchingEventHandler):
                 logging.info(ssh.connect(hostname=host['ip'], port=host['port'], username=host['username']))
                 with SCPClient(ssh.get_transport(), progress4=progress4) as scp:
                     logging.info(scp.put(files=str(pdf_file), remote_path=host['remote_path'], recursive=False))
+            time.sleep(2)
+
+            logging.info(f"Deleting File: {pdf_file}")
+            pdf_file.unlink()
 
 
 if __name__ == '__main__':
