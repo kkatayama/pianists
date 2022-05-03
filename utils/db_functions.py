@@ -445,15 +445,19 @@ def checkPassword(plaintext, hex_pass):
 
 def git_update():
     cmds = (
+        ["sleep", "1"]
         ["git", "add", "--all"],
+        ["sleep", "2"]
         ["git", "commit", "--author=katayama@udel.edu", "-am", "sync db changes"],
+        ["sleep", "3"]
         ["git", "push", "--porcelain", "origin"],
+        ["sleep", "4"]
     )
     for cmd in cmds:
-        # print(subprocess.Popen(cmd, cwd=Path.cwd().as_posix(), universal_newlines=False, shell=None))
-        print(' '.join(cmd))
-        out = subprocess.run(' '.join(cmd), cwd=Path.cwd().as_posix(), shell=True, capture_output=True, text=True).stdout.strip()
-        print(out)
+        print(subprocess.Popen(cmd, cwd=Path.cwd().as_posix(), universal_newlines=False, shell=None))
+        # print(' '.join(cmd))
+        # out = subprocess.run(' '.join(cmd), cwd=Path.cwd().as_posix(), shell=True, capture_output=True, text=True).stdout.strip()
+        # print(out)
 
 def parseParams(secret_key):
     params = {}
