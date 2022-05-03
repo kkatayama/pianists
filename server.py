@@ -131,7 +131,7 @@ def createUser(db):
     res = {"message": "user created", "user_id": user_id, "username": username}
     res.update({"token": genToken("user_id", str(user_id), secret_key)})
 
-    git_update()
+    # git_update()
     if request.params.get('webapp'):
         return template("static/templates/index.tpl", res=res)
     return clean(res)
@@ -146,6 +146,7 @@ def logout():
 
 @app.route('/dashboard', method="GET")
 def dashboard(db):
+    git_update()
     user_id = request.get_cookie("user_id", secret=secret_key)
     if not user_id:
         redirect('/')
@@ -186,7 +187,7 @@ def deleteFile(db):
     num_deletes = deleteRow(db, table="files", where="user_id=? AND entry_id=?", values=[user_id, entry_id])
     res = {"message": f"{num_deletes} file deleted", "file": user_pdf.as_posix()}
 
-    git_update()
+    # git_update()
     if request.params.get("webapp"):
         return template("static/templates/delay.tpl", res=res, location="/dashboard")
     return clean(res)
@@ -299,7 +300,7 @@ def downloadFile(db):
     entry_id = str(insertRow(db, **params))
     res = {"message": "file downloaded", "mmf_entry_id": mmf_entry_id, "entry_id": entry_id}
 
-    git_update()
+    # git_update()
     if request.params.get("webapp"):
         return template("static/templates/delay.tpl", res=res, location="/dashboard")
     return clean(res)

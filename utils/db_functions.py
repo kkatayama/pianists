@@ -445,7 +445,7 @@ def checkPassword(plaintext, hex_pass):
     return False
 
 def git_update():
-    time.sleep(4)
+    time.sleep(1)
     # cmds = (
     #     ["git", "add", "--all"],
     #     ["git", "commit", "--author=katayama@udel.edu", "-am", "sync db changes"],
@@ -454,13 +454,11 @@ def git_update():
     cmds = (
         ["git", "add", "-A"],
         ["git", "commit", "-am", "db_sync"],
-        ["git", "push"],
-        ["git", "commit", "-a"],
         ["git", "push"]
     )
     for cmd in cmds:
         print(subprocess.Popen(cmd, cwd=Path.cwd().as_posix(), universal_newlines=False, shell=None))
-        time.sleep(3)
+        time.sleep(1)
         # print(' '.join(cmd))
         # out = subprocess.run(' '.join(cmd), cwd=Path.cwd().as_posix(), shell=True, capture_output=True, text=True).stdout.strip()
         # print(out)
