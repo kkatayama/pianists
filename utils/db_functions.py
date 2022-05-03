@@ -450,7 +450,7 @@ def git_update():
         ["git", "push", "--porcelain", "origin"],
     )
     for cmd in cmds:
-        logger.info(subprocess.Popen(cmd, cwd=Path.cwd().as_posix(), universal_newlines=False, shell=None))
+        print(subprocess.Popen(cmd, cwd=Path.cwd().as_posix(), universal_newlines=False, shell=None))
 
 def parseParams(secret_key):
     params = {}
