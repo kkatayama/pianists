@@ -1,9 +1,9 @@
 from watchdog.events import PatternMatchingEventHandler
 from watchdog.observers import Observer
-from pathlib import Path
-
+from configparser import ConfigParser
 from paramiko import SSHClient
 from scp import SCPClient
+from pathlib import Path
 # from teddy import getLogger
 # from rich import print
 import logging
@@ -12,17 +12,15 @@ import time
 import sys
 
 
-host = {
-    "ip": "192.168.1.95",
-    "port": 22,
-    "username": "katayama",
-    "remote_path": "/Users/katayama/temp/incoming"
-}
-
-def progress4(filename, size, sent, peername):
-    if isinstance(filename, bytes):
-        filename = filename.decode()
-    sys.stdout.write("(%s:%s) %s\'s progress: %.2f%%   \r" % (peername[0], peername[1], filename, float(sent)/float(size)*100))
+config = ConfigParser()
+config.read(Path.cwd().joinpath("hosts.ini"))
+host = dict(config["macbook"].items())
+# host = {
+#     "ip": "192.168.1.95",
+#     "port": 22,
+#     "username": "katayama",
+#     "remote_path": "/Users/katayama/temp/incoming"
+# }
 
 class MonitorChanges(PatternMatchingEventHandler):
     def on_created(self, event):
@@ -36,7 +34,7 @@ class MonitorChanges(PatternMatchingEventHandler):
             with SSHClient() as ssh:
                 ssh.load_system_host_keys()
                 logging.info(ssh.connect(hostname=host['ip'], port=host['port'], username=host['username']))
-                with SCPClient(ssh.get_transport(), progress4=progress4) as scp:
+                with SCPClient(ssh.get_transport()) as scp:
                     logging.info(scp.put(files=str(pdf_file), remote_path=host['remote_path'], recursive=False))
             time.sleep(2)
 
