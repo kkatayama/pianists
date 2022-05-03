@@ -20,10 +20,9 @@ class MonitorChanges(PatternMatchingEventHandler):
         return
 
     def on_created(self, event):
-        # if ".db" in event.src_path:
-        #     log.info(f'DB Item Added: "Updating GitHub"')
-        #     # self.git_update()
-        return
+        if ".pdf" in event.src_path:
+            logging.info(f'PDF Item Created: "SCP to Server"')
+            logging.info(event)
 
     def on_deleted(self, event):
         # if ".db" in event.src_path:
