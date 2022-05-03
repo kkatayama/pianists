@@ -13,7 +13,7 @@ import sys
 
 
 config = ConfigParser()
-config.read(Path.cwd().joinpath("hosts.ini"))
+config.read(Path(Path.cwd(), "systemd", "hosts.ini"))
 host = dict(config["macbook"].items())
 # host = {
 #     "ip": "192.168.1.95",
