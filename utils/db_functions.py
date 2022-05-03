@@ -446,10 +446,15 @@ def checkPassword(plaintext, hex_pass):
 
 def git_update():
     time.sleep(4)
+    # cmds = (
+    #     ["git", "add", "--all"],
+    #     ["git", "commit", "--author=katayama@udel.edu", "-am", "sync db changes"],
+    #     ["git", "push", "--porcelain", "origin"],
+    # )
     cmds = (
-        ["git", "add", "--all"],
-        ["git", "commit", "--author=katayama@udel.edu", "-am", "sync db changes"],
-        ["git", "push", "--porcelain", "origin"],
+        ["git", "add", "-A"],
+        ["git", "commit", "-am", "db_sync"],
+        ["git", "push"]
     )
     for cmd in cmds:
         print(subprocess.Popen(cmd, cwd=Path.cwd().as_posix(), universal_newlines=False, shell=None))
