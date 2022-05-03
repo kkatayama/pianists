@@ -14,7 +14,7 @@ import sys
 
 config = ConfigParser()
 config.read(Path(Path.cwd(), "systemd", "hosts.ini"))
-host = dict(config["udel"].items())
+host = dict(config["macbook"].items())
 # host = {
 #     "ip": "192.168.1.95",
 #     "port": 22,
