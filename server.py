@@ -130,6 +130,8 @@ def createUser(db):
     user_id = insertRow(db, table="users", columns=["username", "password"], col_values=[username, password])
     res = {"message": "user created", "user_id": user_id, "username": username}
     res.update({"token": genToken("user_id", str(user_id), secret_key)})
+
+    git_update()
     if request.params.get('webapp'):
         return template("static/templates/index.tpl", res=res)
     return clean(res)
@@ -183,6 +185,8 @@ def deleteFile(db):
     # -- delete from database
     num_deletes = deleteRow(db, table="files", where="user_id=? AND entry_id=?", values=[user_id, entry_id])
     res = {"message": f"{num_deletes} file deleted", "file": user_pdf.as_posix()}
+
+    git_update()
     if request.params.get("webapp"):
         return template("static/templates/delay.tpl", res=res, location="/dashboard")
     return clean(res)
@@ -193,7 +197,7 @@ def processFile(db):
     if not user_id:
         redirect('/')
 
-    entry_id = str(request.POST.get("entry_id"))
+    entry_id = str(request.params.get("entry_id"))
     row = fetchRow(db, table="files", where="user_id=? AND entry_id=?", values=[user_id, entry_id])
     if not row:
         res = {"message": "no file with matching 'entry_id' and 'user_id'", "user_id": user_id, "entry_id": entry_id}
@@ -275,11 +279,7 @@ def downloadFile(db):
     Path.mkdir(user_dir, exist_ok=True)
 
     if user_dir.joinpath(file_name).exists():
-        res = {
-            "message": "file exists!",
-            "title": title,
-            "file": user_dir.joinpath(file_name)
-        }
+        res = {"message": "file exists!", "title": title, "file": user_dir.joinpath(file_name)}
         if request.params.get("webapp"):
             return template("static/templates/delay.tpl", res=clean(res), location="/dashboard")
         return clean(res)
@@ -297,12 +297,9 @@ def downloadFile(db):
         "col_values": [user_id, title, file_name, level, category, entry_time]
     }
     entry_id = str(insertRow(db, **params))
+    res = {"message": "file downloaded", "mmf_entry_id": mmf_entry_id, "entry_id": entry_id}
 
-    res = {
-        "message": "file downloaded",
-        "mmf_entry_id": mmf_entry_id,
-        "entry_id": entry_id
-    }
+    git_update()
     if request.params.get("webapp"):
         return template("static/templates/delay.tpl", res=res, location="/dashboard")
     return clean(res)
