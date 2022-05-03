@@ -32,6 +32,7 @@ class MonitorChanges(PatternMatchingEventHandler):
             logging.info(event)
             time.sleep(4)
 
+            logging.info(f'Sending File: {pdf_file}')
             with SSHClient() as ssh:
                 ssh.load_system_host_keys()
                 ssh.connect(hostname=host['ip'], port=host['port'], username=host['username'])
