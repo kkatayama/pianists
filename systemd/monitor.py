@@ -45,7 +45,7 @@ if __name__ == '__main__':
     event_handler = MonitorChanges(patterns=["*.pdf"], ignore_patterns=["*.py", "*.db"], ignore_directories=True)
     observer = Observer()
     # -- observer.daemon=True
-    observer.schedule(event_handler, Path.cwd().join_path("pdf_outgoing").as_posix(), recursive=True)
+    observer.schedule(event_handler, Path.cwd().joinpath("pdf_outgoing").as_posix(), recursive=True)
     observer.start()
     try:
         while True:
