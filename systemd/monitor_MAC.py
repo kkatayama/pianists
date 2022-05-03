@@ -10,18 +10,15 @@ import logging
 import shutil
 import time
 import sys
+import os
 
 
 config = ConfigParser()
 config.read(Path(Path.cwd(), "systemd", "hosts.ini"))
-host = dict(config["udel"].items())
-# host = {
-#     "ip": "192.168.1.95",
-#     "port": 22,
-#     "username": "katayama",
-#     "remote_path": "/Users/katayama/temp/incoming"
-# }
+server = dict(config["server"].items())
+udel = dict(config["udel"].items())
 
+monitor_folder = str(Path("~").expanduser().joinpath('temp/incoming'))
 class MonitorChanges(PatternMatchingEventHandler):
     def on_created(self, event):
         if ".pdf" in event.src_path:
@@ -31,11 +28,9 @@ class MonitorChanges(PatternMatchingEventHandler):
             time.sleep(4)
 
             logging.info(f'Sending File: {pdf_file}')
-            with SSHClient() as ssh:
-                ssh.load_system_host_keys()
-                logging.info(ssh.connect(hostname=host['ip'], port=host['port'], username=host['username']))
-                with SCPClient(ssh.get_transport()) as scp:
-                    logging.info(scp.put(files=str(pdf_file), remote_path=host['remote_path'], recursive=False))
+            cmd = f"rsync -v -e 'ssh -A -t -p {server['port']} {server['username']}@{server['ip']} ssh -A -t -p {udel['port']} {udel['username']}@{udel['ip']}' {str(pdf_file)} :{udel['remote_path']}/temp.pdf"
+            logging.info(cmd)
+            os.system(cmd)
             time.sleep(2)
 
             logging.info(f"Deleting File: {pdf_file}")
@@ -44,13 +39,14 @@ class MonitorChanges(PatternMatchingEventHandler):
 
 if __name__ == '__main__':
     print(Path.cwd())
+    print(monitor_folder)
     # log = getLogger()
     logging.basicConfig(level=logging.INFO)
 
     event_handler = MonitorChanges(patterns=["*.pdf"], ignore_patterns=["*.py", "*.db"], ignore_directories=True)
     observer = Observer()
     # -- observer.daemon=True
-    observer.schedule(event_handler, Path.cwd().joinpath("pdf_outgoing").as_posix(), recursive=True)
+    observer.schedule(event_handler, monitor_folder, recursive=True)
     observer.start()
     try:
         while True:
