@@ -1,0 +1,69 @@
+#!/usr/bin/env python3
+from pathlib import Path
+import argparse
+import fitz
+import cv2
+
+
+def extractDrawings(pdf):
+    doc = fitz.open(pdf)
+    for page in doc:
+        new_rects = []  # resulting rectangles
+
+        for p in page.get_drawings():
+            w = p["width"]
+            r = p["rect"] + (-w, -w, w, w)  # enlarge each rectangle by width value
+            for i in range(len(new_rects)):
+                if abs(r & new_rects[i]) > 0:  # touching one of the new rects?
+                    new_rects[i] |= r  # enlarge it
+                    break
+            # now look if contained in one of the new rects
+            remainder = [s for s in new_rects if r in s]
+            if remainder == []:  # no ==> add this rect to new rects
+                new_rects.append(r)
+
+        new_rects = list(set(new_rects))  # remove any duplicates
+        new_rects.sort(key=lambda r: abs(r), reverse=True)
+        remove = []
+        for j in range(len(new_rects)):
+            for i in range(len(new_rects)):
+                if new_rects[j] in new_rects[i] and i != j:
+                    remove.append(j)
+        remove = list(set(remove))
+        for i in reversed(remove):
+            del new_rects[i]
+        new_rects.sort(key=lambda r: (r.tl.y, r.tl.x))  # sort by location
+        mat = fitz.Matrix(3, 3)  # high resolution matrix
+
+        count = 0
+        for i, r in enumerate(new_rects):
+            if r.height <= 5 or r.width <= 5:
+                continue  # skip lines and empty rects
+            # -- or if height larger than width
+            rr = r + (0, -20, 10, 10)
+            pix = page.get_pixmap(matrix=mat, clip=rr)
+            if pix.height < pix.width:
+                f_all = str(Path.cwd().joinpath(f"draw_raw/{count}.png"))
+                f_top = str(Path.cwd().joinpath(f"draw_crop/{count}.png"))
+                count += 1
+                f_btm = str(Path.cwd().joinpath(f"draw_crop/{count}.png"))
+                pix.save(f_all)
+
+                # -- split image using opencv :(
+                img_all = cv2.imread(f_all)
+                h, w, c = img_all.shape
+                img_top = img_all[: h // 2, :]
+                img_btm = img_all[h // 2 :, :]
+
+                cv2.imwrite(f_top, img_top)
+                cv2.imwrite(f_btm, img_btm)
+                count += 1
+
+
+if __name__ == '__main__':
+    ap = argparse.ArgumentParser()
+    ap.add_argument("pdf", help="pdf file to extract drawings")
+    args = ap.parse_args()
+
+    Path.cwd().joinpath("extracted").mkdir(exist_ok=True)
+    extractDrawings(args.pdf)

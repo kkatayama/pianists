@@ -6,6 +6,7 @@ from scp import SCPClient
 from pathlib import Path
 # from teddy import getLogger
 # from rich import print
+import argparse
 import logging
 import shutil
 import time
@@ -13,17 +14,33 @@ import sys
 import os
 
 
+# -- CONFIGS -- #
 config = ConfigParser()
 config.read(Path(Path.cwd(), "systemd", "hosts.ini"))
 server = dict(config["server"].items())
 udel = dict(config["udel"].items())
 
-monitor_folder = str(Path("~").expanduser().joinpath('temp/incoming'))
+
+def compress(source: Path, destination: Path):
+    base_name = destination.parent / destination.stem
+    fmt = destination.suffix.replace(".", "")
+    root_dir = source.parent
+    base_dir = source.name
+    return shutil.make_archive(str(base_name), fmt, root_dir, base_dir)
+
+
+def extract(file_name: Path, destination: Path):
+    shutil.unpack_archive(file_name, destination)
+
+
 class MonitorChanges(PatternMatchingEventHandler):
+    """Only Triger on file create, delay, then process"""
+
     def on_created(self, event):
+        """Delay after trigger"""
         if ".pdf" in event.src_path:
             pdf_file = Path(event.src_path)
-            logging.info(f'PDF Item Created: "SCP to Server"')
+            logging.info('PDF Item Created: "SCP to Server"')
             logging.info(event)
             time.sleep(4)
 
@@ -38,15 +55,18 @@ class MonitorChanges(PatternMatchingEventHandler):
 
 
 if __name__ == '__main__':
+    ap = argparse.ArgumentParser()
+    ap.add_argument("watch_path", help="the path of the folder being monitored")
+    args = ap.parse_args()
+
     print(Path.cwd())
-    print(monitor_folder)
     # log = getLogger()
     logging.basicConfig(level=logging.INFO)
 
-    event_handler = MonitorChanges(patterns=["*.pdf"], ignore_patterns=["*.py", "*.db"], ignore_directories=True)
+    event_handler = MonitorChanges(patterns=["*.zip"], ignore_directories=True)
     observer = Observer()
     # -- observer.daemon=True
-    observer.schedule(event_handler, monitor_folder, recursive=True)
+    observer.schedule(event_handler, args.watch_path, recursive=True)
     observer.start()
     try:
         while True:

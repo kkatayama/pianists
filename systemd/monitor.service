@@ -1,5 +1,5 @@
 [Unit]
-Description=pianists Database GitHub Sync and Outgoing Monitor
+Description=pianists PDF Processing Monitor
 After=network.target
 
 [Service]

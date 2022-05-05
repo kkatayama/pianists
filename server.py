@@ -286,7 +286,7 @@ def downloadFile(db):
         return clean(res)
 
     # -- download (copy) file
-    src_file = str(Path(Path.cwd(), "lib/making_music_fun", mmf_file["pdf_file"]))
+    src_file = str(Path(Path.cwd(), "utils/making_music_fun", mmf_file["pdf_file"]))
     dst_file = str(Path(user_dir, file_name))
     print("### COPY ###")
     print(f'src_file = "{src_file}"')
