@@ -60,23 +60,43 @@ class MonitorChanges(PatternMatchingEventHandler):
                 logging.info(response)
 
             # -- 3. parse mxl and extract notes
-            BASE_PATH = Path.cwd()
             os.chdir(f"{OMR_RESULTS}")
-            cmd = f'parse_xml {next(OMR_RESULTS.rglob("*.mxl")).relative_to(OMR_RESULTS)}'
-            out = subprocess.run(cmd, shell=True, capture_output=True, text=True).stdout.strip()
-            logging.info(cmd)
-            logging.info(out)
+            BASE_PATH = Path.cwd()
+            PARSE_MXL = "/usr/local/bin/parse_mxl"
+            cmd = [PARSE_MXL, f'{next(OMR_RESULTS.rglob("*.mxl")).relative_to(OMR_RESULTS)}']
+            p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+            for line in iter(p.stdout.readline, b''):
+                response = line.decode().strip()
+                logging.info(response)
 
-            logging.info(f'Sending File: {pdf_file}')
+            # -- 4. crop image drawings
+            os.chdir(f"{TEMP_PATH}")
+            CROP_IMG = "/usr/local/bin/pdf_drawings_png"
+            cmd = [CROP_IMG, f'{pdf_file}']
+            p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+            for line in iter(p.stdout.readline, b''):
+                response = line.decode().strip()
+                logging.info(response)
+
+            # -- 5. compress files to a .zip archive
+            os.chdir(f'{TEMP_PATH.parent}')
+            zip_file = compress(TEMP_PATH, Path.cwd().joinpath('sheet_music.zip'))
+
+            # -- 6. clean-up (delete all files)
+            os.chdir(f'{TEMP_PATH.parent}')
+            zip_file = compress(TEMP_PATH, Path.cwd().joinpath('sheet_music.zip'))
+
+            # -- 7. send file
+            logging.info(f'Sending File: {zip_file}')
             with SSHClient() as ssh:
                 ssh.load_system_host_keys()
                 logging.info(ssh.connect(hostname=host['ip'], port=host['port'], username=host['username']))
                 with SCPClient(ssh.get_transport()) as scp:
-                    logging.info(scp.put(files=str(pdf_file), remote_path=host['remote_path'], recursive=False))
+                    logging.info(scp.put(files=str(zip_file), remote_path=host['remote_path'], recursive=False))
             time.sleep(2)
 
-            logging.info(f"Deleting File: {pdf_file}")
-            pdf_file.unlink()
+            logging.info(f"Deleting File: {zip_file}")
+            zip_file.unlink()
 
 
 if __name__ == '__main__':
