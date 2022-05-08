@@ -37,7 +37,7 @@ def extract(file_name: Path, destination: Path):
 
 
 class MonitorChanges(PatternMatchingEventHandler):
-     """Only Triger on file create, delay, then process"""
+    """Only Triger on file create, delay, then process"""
 
     def on_created(self, event):
         """Delay after trigger"""
