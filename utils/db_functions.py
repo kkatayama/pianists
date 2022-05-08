@@ -25,6 +25,7 @@ from base64 import b64decode, b64encode
 from functools import wraps
 from pathlib import Path
 
+# import pickle5 as pickle
 import subprocess
 import traceback
 import logging
@@ -486,11 +487,13 @@ def parseParams(secret_key):
     for k, v in request.params.items():
         if k == "token":
             try:
+                logger.info(f'cookie_info = {cookie_decode(b64decode(v), secret_key)}')
                 cookie_info = dict([cookie_decode(b64decode(v), secret_key)])
                 for kk, vv in cookie_info.items():
                     request.cookies.update({kk: b64decode(v).decode()})
                 # request.headers.update({"Cookie": f'user_id="{b64decode(v)}"'})
-            except Exception:
+            except Exception as e:
+                logger.error(e)
                 logger.error(f'ERROR: {k} = {v}')
 
     if request.params.get('token'):
