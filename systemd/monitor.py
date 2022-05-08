@@ -104,7 +104,7 @@ if __name__ == '__main__':
     WATCH_PATH = Path.cwd().joinpath("pdf_outgoing")
     TEMP_PATH = Path.cwd().joinpath("temp_files")
 
-    event_handler = MonitorChanges(patterns=["*.zip"], ignore_patterns=["*.py", "*.db"], ignore_directories=True)
+    event_handler = MonitorChanges(patterns=["*.pdf"], ignore_patterns=["*.py", "*.db"], ignore_directories=True)
     observer = Observer()
     # -- observer.daemon=True
     observer.schedule(event_handler, str(WATCH_PATH), recursive=True)
