@@ -16,12 +16,8 @@ import sys
 config = ConfigParser()
 config.read(Path(Path.cwd(), "systemd", "hosts.ini"))
 host = dict(config["macbook"].items())
-# host = {
-#     "ip": "192.168.1.95",
-#     "port": 22,
-#     "username": "katayama",
-#     "remote_path": "/Users/katayama/temp/incoming"
-# }
+WATCH_PATH = Path.cwd().joinpath("pdf_outgoing")
+TEMP_PATH = Path.cwd().joinpath("systemd", "temp_files")
 
 
 def compress(source: Path, destination: Path):
@@ -48,6 +44,7 @@ class MonitorChanges(PatternMatchingEventHandler):
             time.sleep(4)
 
             # -- 1. move pdf file to TEMP_PATH
+            TEMP_PATH.mkdir(exist_ok=True)
             pdf_file = shutil.move(src_file, TEMP_PATH)
 
             # -- 2. run audiveris on the odf file
@@ -101,9 +98,6 @@ class MonitorChanges(PatternMatchingEventHandler):
 
 if __name__ == '__main__':
     logging.basicConfig(level=logging.INFO)
-    WATCH_PATH = Path.cwd().joinpath("pdf_outgoing")
-    TEMP_PATH = Path.cwd().joinpath("temp_files")
-
     event_handler = MonitorChanges(patterns=["*.pdf"], ignore_patterns=["*.py", "*.db"], ignore_directories=True)
     observer = Observer()
     # -- observer.daemon=True
