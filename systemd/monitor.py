@@ -97,6 +97,7 @@ class MonitorChanges(PatternMatchingEventHandler):
 
 
 if __name__ == '__main__':
+    WATCH_PATH.mkdir(exist_ok=True)
     logging.basicConfig(level=logging.INFO)
     event_handler = MonitorChanges(patterns=["*.pdf"], ignore_patterns=["*.py", "*.db"], ignore_directories=True)
     observer = Observer()
