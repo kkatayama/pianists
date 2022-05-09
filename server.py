@@ -210,7 +210,7 @@ def processFile(db):
     file_name = row["file_name"]
     user_dir = Path(Path.cwd(), "pdf_files", user_id)
     user_pdf = str(Path(user_dir, file_name))
-    dst_pdf = str(Path(Path.cwd(), "pdf_outgoing", "temp.pdf"))
+    dst_pdf = str(Path(Path.cwd(), "pdf_outgoing", file_name))
     shutil.copy(user_pdf, dst_pdf)
     # -- send file to [pdf_outgoing]
 
