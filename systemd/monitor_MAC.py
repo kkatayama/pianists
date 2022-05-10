@@ -104,6 +104,8 @@ class MonitorChanges(PatternMatchingEventHandler):
             logger.info(f"deleting ml files: {TEMP_PATH}")
             shutil.rmtree(str(TEMP_PATH))
             TEMP_PATH.mkdir(exist_ok=True)
+            shutil.rmtree(str(WATCH_PATH))
+            WATCH_PATH.mkdir(exist_ok=True)
 
 
 if __name__ == '__main__':
@@ -117,6 +119,9 @@ if __name__ == '__main__':
 
     # -- SETUP -- #
     WATCH_PATH.mkdir(exist_ok=True)
+    shutil.rmtree(str(WATCH_PATH))
+    WATCH_PATH.mkdir(exist_ok=True)
+
     event_handler = MonitorChanges(patterns=["*.zip"], ignore_directories=True)
     observer = Observer()
     observer.schedule(event_handler, str(WATCH_PATH), recursive=False)

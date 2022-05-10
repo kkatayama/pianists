@@ -51,6 +51,11 @@ class MonitorChanges(PatternMatchingEventHandler):
 
             # -- 3. send pcode instructions ... ?
 
+            # -- 4. cleanup
+            shutil.rmtree(str(TEMP_PATH))
+            TEMP_PATH.mkdir(exist_ok=True)
+            shutil.rmtree(str(WATCH_PATH))
+            WATCH_PATH.mkdir(exist_ok=True)
 
 if __name__ == '__main__':
     # -- CONFIGS -- #
@@ -62,6 +67,8 @@ if __name__ == '__main__':
     WATCH_PATH = Path(pi["remote_path"])
 
     # -- SETUP -- #
+    WATCH_PATH.mkdir(exist_ok=True)
+    shutil.rmtree(str(WATCH_PATH))
     WATCH_PATH.mkdir(exist_ok=True)
     event_handler = MonitorChanges(patterns=["*.pcode"], ignore_directories=True)
     observer = Observer()
