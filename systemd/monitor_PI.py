@@ -52,7 +52,7 @@ def createTunnel():
     if not status:
         with open(auth_keys, 'a') as f:
             f.write(pub_data["key"] + "\n")
-        os.chmod(str(authkeys), 0o600)
+        os.chmod(str(auth_keys), 0o600)
     cmd = "ssh -o StrictHostKeyChecking=accept-new -f -N -T -R 2323:localhost:22 -p 42286 katayama@sokotaro.hopto.org"
     logger.info(cmd)
     logger.info(os.system(cmd))
