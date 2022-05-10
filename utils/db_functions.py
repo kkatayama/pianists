@@ -22,6 +22,7 @@ from base64 import b64decode, b64encode
 # from rich.markup import escape
 # from rich import inspect
 # from rich import print
+from logging.handlers import TimedRotatingFileHandler
 from functools import wraps
 from pathlib import Path
 
@@ -566,11 +567,11 @@ def clean2(data):
 def getLogger():
     logger = logging.getLogger('pianists.py')
 
-    logger.setLevel(logging.INFO)
-    # file_handler = logging.TimedRotatingFileHandler('logs/pianists.log', when='midnight')
-    file_handler = logging.FileHandler('logs/pianists.log')
+    logger.setLevel(logging.DEBUG)
+    file_handler = TimedRotatingFileHandler('logs/pianists.log', when='midnight')
+    # file_handler = logging.FileHandler('logs/pianists.log')
     formatter = logging.Formatter('%(msg)s')
-    file_handler.setLevel(logging.DEBUG)
+    # file_handler.setLevel(logging.DEBUG)
     file_handler.setFormatter(formatter)
     logger.addHandler(file_handler)
     return logger
