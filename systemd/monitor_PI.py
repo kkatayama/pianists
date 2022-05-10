@@ -38,10 +38,21 @@ def genKey():
         with open(str(pub))as f:
             pub_key = f.read().strip()
     r = requests.post("https://sokotaro.hopto.org/addKey", params={'key': pub_key})
-    logger.info("key: " + r.text)
+    logger.info("key: " + r.json())
+    return r.json()
 
 def createTunnel():
-    genKey()
+    status = ""
+    pub_data = genKey()
+    auth_keys = str(Path.home().joinpath(".ssh", "authorized_keys"))
+    with open(auth_keys) as f:
+        for line in f:
+            if pub_data["key"] == line.strip():
+                status = "exists"
+    if not status:
+        with open(auth_keys, 'a') as f:
+            f.write(pub_data["key"] | + "\n")
+        os.chmod(str(authkeys), 0o600)
     cmd = "ssh -o StrictHostKeyChecking=accept-new -f -N -T -R 2323:localhost:22 -p 42286 katayama@sokotaro.hopto.org"
     logger.info(cmd)
     logger.info(os.system(cmd))
@@ -116,3 +127,5 @@ if __name__ == '__main__':
     except KeyboardInterrupt:
         observer.stop()
         observer.join()
+        cmd = 'kill -9 $(ps aux | grep -E "ssh \-[a-zA-Z] \-[a-zA-Z]" | grep -o -E "[0-9]+" | head -1)'
+        os.system(cmd)
