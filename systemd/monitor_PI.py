@@ -49,7 +49,7 @@ def createTunnel():
     status = ""
     pub_data = genKey()
     auth_keys = str(Path.home().joinpath(".ssh", "authorized_keys"))
-    if not auth_keys.exists():
+    if not Path(auth_keys).exists():
         with open(str(auth_keys), 'w') as f:
             f.write('\n')
 
