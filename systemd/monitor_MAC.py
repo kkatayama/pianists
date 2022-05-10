@@ -73,7 +73,7 @@ class MonitorChanges(PatternMatchingEventHandler):
             temp_key = data["key_signatures"][0]
             temp_time = data["time_signatures"][0]
             key_signature = f'{temp_key["root_str"]} {temp_key["mode"]}'
-            time_signature = f'{temp_time["numerator]}/{temp_time["denominator"]}'
+            time_signature = f'{temp_time["numerator"]}/{temp_time["denominator"]}'
             logger.debug(f'key_signature: {key_signature}')
             logger.debug(f'time_signature: {time_signature}')
 
