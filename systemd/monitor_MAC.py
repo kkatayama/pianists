@@ -98,6 +98,11 @@ class MonitorChanges(PatternMatchingEventHandler):
             os.system(cmd)
             time.sleep(2)
 
+            # -- 7. clean-up (delete all files)
+            # os.chdir(f'{TEMP_PATH.parent}')
+            logger.info(f"deleting ml files: {TEMP_PATH}")
+            shutil.rmtree(str(TEMP_PATH))
+            TEMP_PATH.mkdir(exist_ok=True)
 
 
 if __name__ == '__main__':
