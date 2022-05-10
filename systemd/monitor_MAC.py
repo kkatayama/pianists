@@ -148,14 +148,15 @@ class MonitorChanges(PatternMatchingEventHandler):
 
             # -- 6. send p-code to raspberry pi
             logger.info(f'Sending p-code File: {PCODE_FILE}')
-            cmd = f"rsync -v -e 'ssh -A -t -p {server['port']} {server['username']}@{server['ip']} ssh -A -t -p {pi['port']} {pi['username']}@{pi['ip']}' {PCODE_FILE} :{pi['remote_path']}/{PCODE_FILE.name}"
+            # cmd = f"rsync -v -e 'ssh -A -t -p {server['port']} {server['username']}@{server['ip']} ssh -A -t -p {pi['port']} {pi['username']}@{pi['ip']}' {PCODE_FILE} :{pi['remote_path']}/{PCODE_FILE.name}"
+            cmd = f"rsync -v -e 'ssh -A -t -p {server['port']} {server['username']}@{server['ip']} ssh -A -t -p {pi['port']} {pi['username']}@{pi['ip']}' {PCODE_FILE} :/home/{pi['username']}/temp.pcode"
             logger.info(cmd)
             os.system(cmd)
-            time.sleep(10)
+            time.sleep(4)
 
             # -- 7. touch p-code file on raspberry pi
             logger.info(f'touch p-code file: {PCODE_FILE}')
-            cmd = f""" ssh -p {server['port']} {server['username']}@{server['ip']} "ssh -p {pi['port']} {pi['username']}@{pi['ip']} 'touch {pi['remote_path']}/{PCODE_FILE.name}'" """.strip()
+            cmd = f""" ssh -p {server['port']} {server['username']}@{server['ip']} "ssh -p {pi['port']} {pi['username']}@{pi['ip']} 'cat /home/{pi['username']}/temp.pcode > {pi['remote_path']}/{PCODE_FILE.name}'" """.strip()
             logger.info(cmd)
             os.system(cmd)
             time.sleep(2)

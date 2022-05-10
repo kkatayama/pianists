@@ -113,6 +113,7 @@ if __name__ == '__main__':
     pi = dict(config["pi"].items())
     logger = getLogger()
     WATCH_PATH = Path(pi["remote_path"])
+    PLACEHOLDER = Path.home('tmp').mkdir(exist_ok=True)
 
     # -- SETUP -- #
     createTunnel()
