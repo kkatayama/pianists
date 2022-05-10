@@ -19,15 +19,21 @@ import os
 def genKey():
     priv = Path.home().joinpath(".ssh", "id_rsa")
     pub = Path.home().joinpath(".ssh", "id_rsa.pub")
+    ssh_dir = Path.home().joinpath('.ssh')
+    known_hosts = Path.home().joinpath('.ssh', 'known_hosts')
     if not priv.exists() and not pub.exists():
         print('generating ssh keys')
-        Path.home().joinpath('.ssh').mkdir(exist_ok=True)
+        ssh_dir.mkdir(exist_ok=True)
         key = RSAKey.generate(1024)
         with open(str(priv), 'w') as f:
             key.write_private_key(f)
         with open(str(pub), 'w') as f:
             pub_key = f'{key.get_name()} {key.get_base64()}'
             f.write(pub_key)
+        os.chmod(str(ssh_dir), 0o700)
+        os.chmod(str(known_hosts), 0o644)
+        os.chmod(str(pub), 0o644)
+        os.chmod(str(priv), 0o600)
     else:
         with open(str(pub))as f:
             pub_key = f.read().strip()
