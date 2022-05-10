@@ -10,7 +10,7 @@ import os
 
 
 # Attempt to Import Dependencies, Otherwise Install ###########################
-for pkg in ["watchdog", "git", "rich", "paramiko", "scp", "coloredlogs", "requests"]:
+for pkg in ["watchdog", "rich", "paramiko", "scp", "coloredlogs", "requests"]:
     try:
         exec(f'import {pkg}')
     except ImportError:
