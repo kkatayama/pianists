@@ -105,15 +105,6 @@ class MonitorChanges(PatternMatchingEventHandler):
             logger.info(f"Deleting File: {zip_file}")
             Path(zip_file).unlink()
 
-    def on_deleted(event):
-        logger.info(event)
-
-    def on_modified(event):
-        logger.info(event)
-
-    def on_moved(event):
-        logger.info(event)
-
 
 if __name__ == '__main__':
     # -- GLOBALS -- #
