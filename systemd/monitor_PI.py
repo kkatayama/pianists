@@ -63,7 +63,7 @@ class MonitorChanges(PatternMatchingEventHandler):
 
     def on_moved(self, event):
         """Delay after trigger"""
-        if ".pcode" in event.src_path:
+        if event.src_path.endswith('.pcode'):
             src_file = Path(event.src_path)
             logger.info(f'detected pcode file: {src_file}')
             time.sleep(4)
