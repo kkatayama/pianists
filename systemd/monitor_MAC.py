@@ -93,6 +93,7 @@ class MonitorChanges(PatternMatchingEventHandler):
 
             # -- 1. move zip file to TEMP_PATH
             logger.info(f"moving {src_file.name} to {TEMP_PATH}")
+            TEMP_PATH.mkdir(exist_ok=True)
             shutil.rmtree(str(TEMP_PATH))
             TEMP_PATH.mkdir(exist_ok=True)
             zip_file = shutil.move(str(src_file), str(TEMP_PATH))
@@ -164,10 +165,8 @@ class MonitorChanges(PatternMatchingEventHandler):
             # -- 8. clean-up (delete all files)
             # os.chdir(f'{TEMP_PATH.parent}')
             logger.info(f"deleting ml files: {TEMP_PATH}")
-            shutil.rmtree(str(TEMP_PATH))
-            TEMP_PATH.mkdir(exist_ok=True)
-            # shutil.rmtree(str(WATCH_PATH))
-            # WATCH_PATH.mkdir(exist_ok=True)
+            # shutil.rmtree(str(TEMP_PATH))
+            # TEMP_PATH.mkdir(exist_ok=True)
 
 
 if __name__ == '__main__':
