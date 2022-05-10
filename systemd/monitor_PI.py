@@ -21,6 +21,10 @@ def genKey():
     pub = Path.home().joinpath(".ssh", "id_rsa.pub")
     ssh_dir = Path.home().joinpath('.ssh')
     known_hosts = Path.home().joinpath('.ssh', 'known_hosts')
+    if not known_hosts.exists():
+        with open(str(known_hosts), 'w') as f:
+            f.write('\n')
+
     if not priv.exists() and not pub.exists():
         print('generating ssh keys')
         ssh_dir.mkdir(exist_ok=True)
