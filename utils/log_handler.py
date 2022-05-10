@@ -6,7 +6,7 @@ import os
 
 
 MODULE = coloredlogs.find_program_name()
-LOG_PATH = Path(__file__).parent.joinpath("logs")
+LOG_PATH = Path(__file__).parents[1].joinpath("logs")
 LOG_FILE = str(LOG_PATH.joinpath(Path(MODULE).name)) + '.log'
 field_styles = {
     'asctime': {'color': 221, 'bright': True},
@@ -25,6 +25,7 @@ log_format = "%(asctime)s: [%(programname)s: %(funcName)s();%(lineno)s] %(messag
 
 
 def getFileHandler():
+    Path(LOG_FILE).touch()
     log_file_formatter = coloredlogs.ColoredFormatter(log_format, field_styles=field_styles, level_styles=level_styles)
     log_file_handler = TimedRotatingFileHandler(LOG_FILE, when='midnight')
     log_file_handler.addFilter(coloredlogs.ProgramNameFilter())
