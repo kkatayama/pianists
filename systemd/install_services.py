@@ -65,6 +65,7 @@ def installLinuxDaemonServer():
         # -- "monitor.py" doesn't use Environment Variables
         if "monitor" in service.name:
             config["Service"]["ExecStart"] = f'{user_info["py"]} {user_info["monitor"]}'
+            config["Service"]["EnvironmentFile"] = user_info["conf"].replace("pianists_service", "monitor_service")
         else:
             config["Service"]["ExecStart"] = f'{user_info["py"]} {user_info["app"]}'
             config["Service"]["EnvironmentFile"] = user_info["conf"]
