@@ -105,9 +105,9 @@ class MonitorChanges(PatternMatchingEventHandler):
 
 if __name__ == '__main__':
     # -- GLOBALS -- #
-    BASE_PATH = Path.cwd()
-    WATCH_PATH = Path.cwd().joinpath("pdf_outgoing")
-    TEMP_PATH = Path.cwd().joinpath("systemd", "ml_results")
+    BASE_PATH = Path(__file__).absolute().parents[1]
+    WATCH_PATH = BASE_PATH.joinpath("pdf_outgoing")
+    TEMP_PATH = BASE_PATH.joinpath("systemd", "ml_results")
     logger = getLogger()
 
     # -- SETUP -- #
