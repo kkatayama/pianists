@@ -63,6 +63,9 @@ class MonitorChanges(PatternMatchingEventHandler):
 
     def on_any_event(self, event):
         """Delay after trigger"""
+        src_file = Path(event.src_path)
+        logger.info(f'detected pcode file: {src_file}')
+        logger.info(f'detected pcode file: {src_file.name}')
         if Path(event.src_path).name.endswith('.pcode'):
             src_file = Path(event.src_path)
             logger.info(f'detected pcode file: {src_file}')
