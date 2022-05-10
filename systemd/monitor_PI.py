@@ -6,7 +6,6 @@ from watchdog.events import PatternMatchingEventHandler
 from watchdog.observers import Observer
 from log_handler import getLogger
 from configparser import ConfigParser
-import pandas as pd
 import requests
 import shutil
 import json
