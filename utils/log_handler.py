@@ -7,7 +7,7 @@ import os
 
 MODULE = coloredlogs.find_program_name()
 LOG_PATH = Path(__file__).parents[1].joinpath("logs")
-LOG_FILE = str(LOG_PATH.joinpath(Path(MODULE).name)) + '.log'
+LOG_FILE = str(LOG_PATH.joinpath(Path(MODULE).stem)) + '.log'
 field_styles = {
     'asctime': {'color': 221, 'bright': True},
     'programname': {'color': 45, 'faint': True},
