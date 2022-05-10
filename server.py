@@ -42,6 +42,15 @@ def commands():
         res = json.load(f)
     return res
 
+@app.route('/getINI', method=["GET", "POST"])
+def getINI():
+    CONFIG_INI = Path.home().joinpath(".config", "pianists", "config.ini")
+    print(f"CONFIG_INI = {CONFIG_INI}")
+    with open(str(CONFIG_INI)) as f:
+        data = f.read()
+    print(f'data = {data}')
+    return str(data)
+
 
 @app.route("/test", method=["GET", "POST"])
 def test():
