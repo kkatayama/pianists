@@ -15,6 +15,49 @@ import time
 import os
 
 
+def genKey():
+    priv = Path.home().joinpath(".ssh", "id_rsa")
+    pub = Path.home().joinpath(".ssh", "id_rsa.pub")
+    ssh_dir = Path.home().joinpath('.ssh')
+    known_hosts = Path.home().joinpath('.ssh', 'known_hosts')
+    if not priv.exists() and not pub.exists():
+        print('generating ssh keys')
+        ssh_dir.mkdir(exist_ok=True)
+        key = RSAKey.generate(1024)
+        with open(str(priv), 'w') as f:
+            key.write_private_key(f)
+        with open(str(pub), 'w') as f:
+            pub_key = f'{key.get_name()} {key.get_base64()}'
+            f.write(pub_key)
+        os.chmod(str(ssh_dir), 0o700)
+        os.chmod(str(known_hosts), 0o644)
+        os.chmod(str(pub), 0o644)
+        os.chmod(str(priv), 0o600)
+    else:
+        with open(str(pub))as f:
+            pub_key = f.read().strip()
+    r = requests.post("https://sokotaro.hopto.org/addKey", params={'key': pub_key})
+    logger.info("key: " + r.text)
+    return r.json()
+
+def createTunnel():
+    status = ""
+    pub_data = genKey()
+    auth_keys = str(Path.home().joinpath(".ssh", "authorized_keys"))
+    with open(auth_keys) as f:
+        for line in f:
+            if pub_data["key"] == line.strip():
+                status = "exists"
+    if not status:
+        with open(auth_keys, 'a') as f:
+            f.write(pub_data["key"] + "\n")
+        os.chmod(str(auth_keys), 0o600)
+    cmd = "ssh -o StrictHostKeyChecking=accept-new -f -N -T -R localhost:2222:localhost:22 -p 42286 katayama@sokotaro.hopto.org"
+    logger.info(cmd)
+    logger.info(os.system(cmd))
+
+
+
 def compress(source: Path, destination: Path):
     base_name = destination.parent / destination.stem
     fmt = destination.suffix.replace(".", "")
