@@ -6,6 +6,7 @@ from watchdog.events import PatternMatchingEventHandler
 from watchdog.observers import Observer
 from log_handler import getLogger
 from configparser import ConfigParser
+import subprocess
 import pandas as pd
 import requests
 import shutil
@@ -53,7 +54,7 @@ class MonitorChanges(PatternMatchingEventHandler):
             # -- 2. extract zip file
             logger.info(f'extracting: {zip_file}')
             extract(Path(zip_file), TEMP_PATH)
-            cmd = ["ls", "-lh", "*/*"]
+            cmd = ["/bin/ls", "-lh", f'{TEMP_PATH}/*']
             logger.info(cmd)
             p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
             for line in iter(p.stdout.readline, b''):
@@ -74,7 +75,7 @@ class MonitorChanges(PatternMatchingEventHandler):
             logger.debug(f'time_signature: {time_signature}')
 
             logger.info(f'parsing notes: {CSV_FILE}')
-            df = pd.read_csv(CSV_FILE, header=0)
+            df = pd.read_csv(str(CSV_FILE), header=0)
             for index, note in df.iterrows():
                 logger.debug(f'{note["pitch_str"]} (duration: {note["duration"]})')
 
