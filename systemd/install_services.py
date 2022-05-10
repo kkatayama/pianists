@@ -10,6 +10,9 @@ import os
 
 
 # Attempt to Import Dependencies, Otherwise Install ###########################
+cmd = f'{sys.executable} -m pip install -U pip'
+print(cmd)
+os.system(cmd)
 for pkg in ["watchdog", "rich", "paramiko", "scp", "coloredlogs", "requests", "pandas"]:
     try:
         exec(f'import {pkg}')
