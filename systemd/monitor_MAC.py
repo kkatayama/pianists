@@ -142,7 +142,7 @@ class MonitorChanges(PatternMatchingEventHandler):
 
             # -- 5. generate p-code ...
             logger.info(f'generating p-code ...')
-            PCODE_FILE = str(CSV_FILE).replace('.csv', '.pcode')
+            PCODE_FILE = Path(str(CSV_FILE).replace('.csv', '.pcode'))
 
             # -- 6. send p-code to raspberry pi
             logger.info(f'Sending p-code File: {PCODE_FILE}')

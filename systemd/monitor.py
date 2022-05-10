@@ -5,6 +5,7 @@ sys.path.append(str(Path(__file__).absolute().parents[1].joinpath('utils')))
 from watchdog.events import PatternMatchingEventHandler
 from watchdog.observers import Observer
 from log_handler import getLogger
+from db_functions import git_update
 from configparser import ConfigParser
 from paramiko import SSHClient
 from scp import SCPClient
@@ -102,8 +103,10 @@ class MonitorChanges(PatternMatchingEventHandler):
                     scp.put(files=str(zip_file), remote_path=host['remote_path'], recursive=False)
             time.sleep(2)
 
+            # -- 8 cleanup
             logger.info(f"Deleting File: {zip_file}")
             Path(zip_file).unlink()
+            git_update()
 
 
 if __name__ == '__main__':
