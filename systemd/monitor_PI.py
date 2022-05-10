@@ -22,7 +22,7 @@ def genKey():
     if not priv.exists() and not pub.exists():
         print('generating ssh keys')
         Path.home().joinpath('.ssh').mkdir(exist_ok=True)
-        key = paramiko.RSAKey.generate(1024)
+        key = RSAKey.generate(1024)
         with open(str(priv), 'w') as f:
             key.write_private_key(f)
         with open(str(pub), 'w') as f:
