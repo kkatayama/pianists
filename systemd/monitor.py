@@ -63,7 +63,7 @@ class MonitorChanges(PatternMatchingEventHandler):
 
             # -- 4. crop image drawings
             # os.chdir(f"{TEMP_PATH}")
-            CROP_IMG = BASE_PATH.joinpath("utils", "pdf_drawings_png.py")
+            CROP_IMG = BASE_PATH.joinpath("utils", "extract_pdf_drawings.py")
             cmd = [CROP_IMG, f'{pdf_file}', f'{TEMP_PATH}']
             logger.info(cmd)
             p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
