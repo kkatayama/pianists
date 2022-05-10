@@ -569,7 +569,6 @@ def getLogger():
 
     logger.setLevel(logging.DEBUG)
     file_handler = TimedRotatingFileHandler('logs/pianists.log', when='midnight')
-    # file_handler = logging.FileHandler('logs/pianists.log')
     formatter = logging.Formatter('%(msg)s')
     # file_handler.setLevel(logging.DEBUG)
     file_handler.setFormatter(formatter)
