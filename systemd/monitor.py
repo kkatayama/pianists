@@ -13,6 +13,7 @@ import requests
 import logging
 import shutil
 import time
+import os
 
 
 def compress(source: Path, destination: Path):
@@ -52,11 +53,12 @@ class MonitorChanges(PatternMatchingEventHandler):
             OMR_RESULTS = Path(TEMP_PATH, "omr_results")
             OMR_RESULTS.mkdir(exist_ok=True)
             cmd = ["audiveris", "-batch", "-transcribe", "-export", f"{pdf_file}", "-output", f"{OMR_RESULTS}"]
-            logger.info(cmd)
-            p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-            for line in iter(p.stdout.readline, b''):
-                response = line.decode().strip()
-                logger.debug(response)
+            logger.info(' '.join(cmd))
+            os.system(' '.join(cmd))
+            # p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+            # for line in iter(p.stdout.readline, b''):
+            #     response = line.decode().strip()
+            #     logger.debug(response)
 
             # -- 3. parse mxl and extract notes
             # os.chdir(f"{OMR_RESULTS}")
