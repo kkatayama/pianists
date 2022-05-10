@@ -153,7 +153,14 @@ class MonitorChanges(PatternMatchingEventHandler):
             os.system(cmd)
             time.sleep(2)
 
-            # -- 7. clean-up (delete all files)
+            # -- 7. touch p-code file on raspberry pi
+            logger.info(f'touch p-code file: {PCODE_FILE}')
+            cmd = f""" ssh -p {server['port']} {server['username']}@{server['ip']} "ssh -p {pi['port']} {pi['username']}@{pi['ip']} 'touch {pi['remote_path']}/{PCODE_FILE.name}'" """.strip()
+            logger.info(cmd)
+            os.system(cmd)
+            time.sleep(2)
+
+            # -- 8. clean-up (delete all files)
             # os.chdir(f'{TEMP_PATH.parent}')
             logger.info(f"deleting ml files: {TEMP_PATH}")
             shutil.rmtree(str(TEMP_PATH))
