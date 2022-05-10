@@ -46,7 +46,7 @@ class MonitorChanges(PatternMatchingEventHandler):
             # -- 1. move pdf file to TEMP_PATH
             logger.info(f"moving {src_file.name} to {TEMP_PATH}")
             TEMP_PATH.mkdir(exist_ok=True)
-            pdf_file = shutil.move(src_file, TEMP_PATH)
+            pdf_file = shutil.move(src_file, str(TEMP_PATH))
 
             # -- 2. run audiveris on the odf file
             OMR_RESULTS = Path(TEMP_PATH, "omr_results")
@@ -86,7 +86,7 @@ class MonitorChanges(PatternMatchingEventHandler):
             # -- 6. clean-up (delete all files)
             # os.chdir(f'{TEMP_PATH.parent}')
             logger.info("deleting ml files: systemd/ml_results")
-            shutil.rmtree(TEMP_PATH)
+            shutil.rmtree(str(TEMP_PATH))
             TEMP_PATH.mkdir(exist_ok=True)
 
             # -- 7. send file
