@@ -1,0 +1,411 @@
+{
+  "query": "SELECT * FROM files WHERE user_id=?;"
+}
+{
+  "values": [
+    "1"
+  ]
+}
+127.0.0.1 2022-05-09 21:19:49.944827 GET http://127.0.0.1:8380/dashboard 200 OK
+{"request.params": {"webapp": true}}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Pianists</title>
+    <link rel="stylesheet" type="text/css" href="/static/css/blueTableDashboard.css">
+  </head>
+
+  <body>
+    <div class="outer">
+      <div class="top">
+        <form method="post">
+          <div class="banner">User Dashboard</div>
+          <table class="greenTable" id="results">
+            <thead>
+              <tr>
+                <th></th>
+                <th>ID</th>
+                <th>Title</th>
+                <th>File Name</th>
+                <th>Level</th>
+                <th>Category</th>
+                <th>Date Downloaded</th>
+              </tr>
+            </thead>
+            <tbody>
+                  <tr>
+                    <td>
+                      <input type="radio" name="entry_id" value="5" checked />
+                    </td>
+                    <td>5</td>
+                    <td>Amazing Grace</td>
+                    <td>amazing-grace-beginner-piano.pdf</td>
+                    <td>Level 1</td>
+                    <td>Christian</td>
+                    <td>2022-04-19 10:36:51.983859</td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <input type="radio" name="entry_id" value="6" checked />
+                    </td>
+                    <td>6</td>
+                    <td>Mexican Hat Dance</td>
+                    <td>mexican-hat-dance-piano-solo.pdf</td>
+                    <td>Level 1</td>
+                    <td>no_category</td>
+                    <td>2022-04-19 10:37:07.447791</td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <input type="radio" name="entry_id" value="7" checked />
+                    </td>
+                    <td>7</td>
+                    <td>Jolly Old Saint Nicholas</td>
+                    <td>jolly-old-saint-nicholas-piano-solo.pdf</td>
+                    <td>Level 1</td>
+                    <td>Christmas</td>
+                    <td>2022-04-19 10:37:35.826132</td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <input type="radio" name="entry_id" value="8" checked />
+                    </td>
+                    <td>8</td>
+                    <td>O Come, O Come Emmanuel</td>
+                    <td>o-come-emmanuel-piano.pdf</td>
+                    <td>Level 2</td>
+                    <td>Christmas</td>
+                    <td>2022-04-19 10:50:55.464539</td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <input type="radio" name="entry_id" value="9" checked />
+                    </td>
+                    <td>9</td>
+                    <td>Happy Birthday</td>
+                    <td>happy-birthday-easy-piano.pdf</td>
+                    <td>Level 1</td>
+                    <td>no_category</td>
+                    <td>2022-04-19 13:04:50.854695</td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <input type="radio" name="entry_id" value="10" checked />
+                    </td>
+                    <td>10</td>
+                    <td>Little Green Frog (Galumph)</td>
+                    <td>little_green_frog_piano.pdf</td>
+                    <td>Level 1</td>
+                    <td>Nursery Rhyme</td>
+                    <td>2022-04-19 13:28:27.531126</td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <input type="radio" name="entry_id" value="12" checked />
+                    </td>
+                    <td>12</td>
+                    <td>Minuet in G</td>
+                    <td>minuet-in-g.pdf</td>
+                    <td>Level 1</td>
+                    <td>Bach</td>
+                    <td>2022-04-28 22:17:48.731458</td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <input type="radio" name="entry_id" value="13" checked />
+                    </td>
+                    <td>13</td>
+                    <td>Humpty Dumpty</td>
+                    <td>humpty-dumpty-piano.pdf</td>
+                    <td>Level 1</td>
+                    <td>Mother Goose</td>
+                    <td>2022-04-29 17:40:55.293424</td>
+                  </tr>
+            </tbody>
+          </table>
+      </div>
+      <div class="below">
+        <input type="submit" class="submit" formaction="/deleteFile" name="webapp" value="Delete File" />
+        <input type="submit" class="submit" formaction="/processFile" name="webapp" value="Process File" />
+        <a href="/search" class="submit">Find Sheet Music</a>
+        <a href="/logout" class="submit">Log Out</a>
+        </form>
+      </div>
+    </div>
+  </body>
+</html>
+
+{
+  "query": "SELECT * FROM files WHERE user_id=?;"
+}
+{
+  "values": [
+    "1"
+  ]
+}
+127.0.0.1 2022-05-09 21:31:25.789328 GET http://127.0.0.1:8380/dashboard 200 OK
+{"request.params": {"webapp": true}}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Pianists</title>
+    <link rel="stylesheet" type="text/css" href="/static/css/blueTableDashboard.css">
+  </head>
+
+  <body>
+    <div class="outer">
+      <div class="top">
+        <form method="post">
+          <div class="banner">User Dashboard</div>
+          <table class="greenTable" id="results">
+            <thead>
+              <tr>
+                <th></th>
+                <th>ID</th>
+                <th>Title</th>
+                <th>File Name</th>
+                <th>Level</th>
+                <th>Category</th>
+                <th>Date Downloaded</th>
+              </tr>
+            </thead>
+            <tbody>
+                  <tr>
+                    <td>
+                      <input type="radio" name="entry_id" value="5" checked />
+                    </td>
+                    <td>5</td>
+                    <td>Amazing Grace</td>
+                    <td>amazing-grace-beginner-piano.pdf</td>
+                    <td>Level 1</td>
+                    <td>Christian</td>
+                    <td>2022-04-19 10:36:51.983859</td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <input type="radio" name="entry_id" value="6" checked />
+                    </td>
+                    <td>6</td>
+                    <td>Mexican Hat Dance</td>
+                    <td>mexican-hat-dance-piano-solo.pdf</td>
+                    <td>Level 1</td>
+                    <td>no_category</td>
+                    <td>2022-04-19 10:37:07.447791</td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <input type="radio" name="entry_id" value="7" checked />
+                    </td>
+                    <td>7</td>
+                    <td>Jolly Old Saint Nicholas</td>
+                    <td>jolly-old-saint-nicholas-piano-solo.pdf</td>
+                    <td>Level 1</td>
+                    <td>Christmas</td>
+                    <td>2022-04-19 10:37:35.826132</td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <input type="radio" name="entry_id" value="8" checked />
+                    </td>
+                    <td>8</td>
+                    <td>O Come, O Come Emmanuel</td>
+                    <td>o-come-emmanuel-piano.pdf</td>
+                    <td>Level 2</td>
+                    <td>Christmas</td>
+                    <td>2022-04-19 10:50:55.464539</td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <input type="radio" name="entry_id" value="9" checked />
+                    </td>
+                    <td>9</td>
+                    <td>Happy Birthday</td>
+                    <td>happy-birthday-easy-piano.pdf</td>
+                    <td>Level 1</td>
+                    <td>no_category</td>
+                    <td>2022-04-19 13:04:50.854695</td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <input type="radio" name="entry_id" value="10" checked />
+                    </td>
+                    <td>10</td>
+                    <td>Little Green Frog (Galumph)</td>
+                    <td>little_green_frog_piano.pdf</td>
+                    <td>Level 1</td>
+                    <td>Nursery Rhyme</td>
+                    <td>2022-04-19 13:28:27.531126</td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <input type="radio" name="entry_id" value="12" checked />
+                    </td>
+                    <td>12</td>
+                    <td>Minuet in G</td>
+                    <td>minuet-in-g.pdf</td>
+                    <td>Level 1</td>
+                    <td>Bach</td>
+                    <td>2022-04-28 22:17:48.731458</td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <input type="radio" name="entry_id" value="13" checked />
+                    </td>
+                    <td>13</td>
+                    <td>Humpty Dumpty</td>
+                    <td>humpty-dumpty-piano.pdf</td>
+                    <td>Level 1</td>
+                    <td>Mother Goose</td>
+                    <td>2022-04-29 17:40:55.293424</td>
+                  </tr>
+            </tbody>
+          </table>
+      </div>
+      <div class="below">
+        <input type="submit" class="submit" formaction="/deleteFile" name="webapp" value="Delete File" />
+        <input type="submit" class="submit" formaction="/processFile" name="webapp" value="Process File" />
+        <a href="/search" class="submit">Find Sheet Music</a>
+        <a href="/logout" class="submit">Log Out</a>
+        </form>
+      </div>
+    </div>
+  </body>
+</html>
+
+{
+  "query": "SELECT * FROM files WHERE user_id=?;"
+}
+{
+  "values": [
+    "1"
+  ]
+}
+127.0.0.1 2022-05-09 21:32:16.095845 GET http://127.0.0.1:8380/dashboard 200 OK
+{"request.params": {"webapp": true}}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Pianists</title>
+    <link rel="stylesheet" type="text/css" href="/static/css/blueTableDashboard.css">
+  </head>
+
+  <body>
+    <div class="outer">
+      <div class="top">
+        <form method="post">
+          <div class="banner">User Dashboard</div>
+          <table class="greenTable" id="results">
+            <thead>
+              <tr>
+                <th></th>
+                <th>ID</th>
+                <th>Title</th>
+                <th>File Name</th>
+                <th>Level</th>
+                <th>Category</th>
+                <th>Date Downloaded</th>
+              </tr>
+            </thead>
+            <tbody>
+                  <tr>
+                    <td>
+                      <input type="radio" name="entry_id" value="5" checked />
+                    </td>
+                    <td>5</td>
+                    <td>Amazing Grace</td>
+                    <td>amazing-grace-beginner-piano.pdf</td>
+                    <td>Level 1</td>
+                    <td>Christian</td>
+                    <td>2022-04-19 10:36:51.983859</td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <input type="radio" name="entry_id" value="6" checked />
+                    </td>
+                    <td>6</td>
+                    <td>Mexican Hat Dance</td>
+                    <td>mexican-hat-dance-piano-solo.pdf</td>
+                    <td>Level 1</td>
+                    <td>no_category</td>
+                    <td>2022-04-19 10:37:07.447791</td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <input type="radio" name="entry_id" value="7" checked />
+                    </td>
+                    <td>7</td>
+                    <td>Jolly Old Saint Nicholas</td>
+                    <td>jolly-old-saint-nicholas-piano-solo.pdf</td>
+                    <td>Level 1</td>
+                    <td>Christmas</td>
+                    <td>2022-04-19 10:37:35.826132</td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <input type="radio" name="entry_id" value="8" checked />
+                    </td>
+                    <td>8</td>
+                    <td>O Come, O Come Emmanuel</td>
+                    <td>o-come-emmanuel-piano.pdf</td>
+                    <td>Level 2</td>
+                    <td>Christmas</td>
+                    <td>2022-04-19 10:50:55.464539</td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <input type="radio" name="entry_id" value="9" checked />
+                    </td>
+                    <td>9</td>
+                    <td>Happy Birthday</td>
+                    <td>happy-birthday-easy-piano.pdf</td>
+                    <td>Level 1</td>
+                    <td>no_category</td>
+                    <td>2022-04-19 13:04:50.854695</td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <input type="radio" name="entry_id" value="10" checked />
+                    </td>
+                    <td>10</td>
+                    <td>Little Green Frog (Galumph)</td>
+                    <td>little_green_frog_piano.pdf</td>
+                    <td>Level 1</td>
+                    <td>Nursery Rhyme</td>
+                    <td>2022-04-19 13:28:27.531126</td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <input type="radio" name="entry_id" value="12" checked />
+                    </td>
+                    <td>12</td>
+                    <td>Minuet in G</td>
+                    <td>minuet-in-g.pdf</td>
+                    <td>Level 1</td>
+                    <td>Bach</td>
+                    <td>2022-04-28 22:17:48.731458</td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <input type="radio" name="entry_id" value="13" checked />
+                    </td>
+                    <td>13</td>
+                    <td>Humpty Dumpty</td>
+                    <td>humpty-dumpty-piano.pdf</td>
+                    <td>Level 1</td>
+                    <td>Mother Goose</td>
+                    <td>2022-04-29 17:40:55.293424</td>
+                  </tr>
+            </tbody>
+          </table>
+      </div>
+      <div class="below">
+        <input type="submit" class="submit" formaction="/deleteFile" name="webapp" value="Delete File" />
+        <input type="submit" class="submit" formaction="/processFile" name="webapp" value="Process File" />
+        <a href="/search" class="submit">Find Sheet Music</a>
+        <a href="/logout" class="submit">Log Out</a>
+        </form>
+      </div>
+    </div>
+  </body>
+</html>
+

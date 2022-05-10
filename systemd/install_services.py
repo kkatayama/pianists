@@ -10,7 +10,7 @@ import os
 
 
 # Attempt to Import Dependencies, Otherwise Install ###########################
-for pkg in ["watchdog", "rich", "paramiko", "scp", "coloredlogs", "requests"]:
+for pkg in ["watchdog", "rich", "paramiko", "scp", "coloredlogs", "requests", "pandas"]:
     try:
         exec(f'import {pkg}')
     except ImportError:
@@ -98,6 +98,100 @@ def installLinuxDaemonServer():
         conf.write(f)
 
 
+def installLinuxDaemonPI():
+    # Extract Current User Info Running This Script ###############################
+    c = Console()
+    text = Text.assemble(
+        ("Configure Setup: ", "magenta"),
+        ("(press enter to select default value)", "green"),
+        justify="center",
+    )
+    c.print(Panel(text, width=80))
+
+    default = os.environ.get("USER")
+    USER = Prompt.ask("[yellow]USER[/]", default=default)
+
+    default = "P-Code Monitor"
+    SERVICE_NAME = Prompt.ask("[yellow]SERVICE_NAME[/]", default=default)
+
+    default = str(Path.home().joinpath("incoming"))
+    WATCH_PATH = Prompt.ask("[yellow]WATCH_PATH[/]", default=default)
+    Path(WATCH_PATH).mkdir(exist_ok=True, parents=True)
+
+    default = sys.executable
+    PYTHON_EXE = Prompt.ask("[yellow]PYTHON_EXE[/]", default=default)
+
+    default = str(PY_FILE.parent.joinpath("monitor_PI.py"))
+    WATCH_DOG = Prompt.ask("[yellow]WATCH_DOG[/]", default=default)
+
+    default = str(Path.home().joinpath("pcode_processing"))
+    TEMP_PATH = Prompt.ask("[yellow]TEMP_PATH[/]", default=default)
+    Path(TEMP_PATH).mkdir(exist_ok=True, parents=True)
+    print("\n")
+
+    print(f"\nExporting Config: {Path.home()}/.config/pianists/config.ini")
+    r = requests.post("https://sokotaro.hopto.org/getINI")
+    config = ConfigParser()
+    config.read_string(r.text)
+    config["pi"] = {
+        "ip": "localhost",
+        "port": "2323",
+        "username": USER,
+        "remote_path": WATCH_PATH,
+        "temp_path": TEMP_PATH
+    }
+    with open(str(CONF_INI), 'w') as f:
+        config.write(f)
+
+    print("\nNotify Server")
+    r = requests.post("https://sokotaro.hopto.org/addPI", params=dict(config["pi"]))
+
+    print("\nExporting Service Daemon!")
+    conf = ConfigParser()
+    conf.optionxform = str
+    conf["Unit"] = {
+        "Description": SERVICE_NAME,
+        "After": "network.target"
+    }
+    conf["Service"] = {
+        "User": USER,
+        "WorkingDirectory": TEMP_PATH,
+        "ExecStart": f'{PYTHON_EXE} {WATCH_DOG}',
+        "Restart": 'on-failure'
+    }
+    conf["Install"] = {
+        "WantedBy": "multi-user.target"
+    }
+
+    # -- export temp.service
+    TEMP_SERVICE = Path.home().joinpath('temp.service')
+    with open(f'{TEMP_SERVICE}', 'w') as f:
+        conf.write(f)
+
+    # -- repair temp.service
+    with open(f'{TEMP_SERVICE}') as ff:
+        raw = ff.read()
+    with open(f'{TEMP_SERVICE}', 'w') as f:
+        f.write(raw.replace(' = ', '='))
+
+    # -- Install Service
+    cmd = f"sudo cp {TEMP_SERVICE} /etc/systemd/system/monitor_pi.service"
+    subprocess.run(cmd, shell=True, capture_output=True, text=True)
+    print(cmd)
+
+    cmd = f"sudo systemctl daemon-reload"
+    subprocess.run(cmd, shell=True, capture_output=True, text=True)
+    print(cmd)
+
+    cmd = "sudo systemctl enable monitor_pi"
+    subprocess.run(cmd, shell=True, capture_output=True, text=True)
+    print(cmd)
+
+    cmd = "sudo systemctl start monitor_pi"
+    subprocess.run(cmd, shell=True, capture_output=True, text=True)
+    print(cmd)
+
+
 def installMacDaemon():
     # Extract Current User Info Running This Script ###############################
     c = Console()
@@ -115,7 +209,7 @@ def installMacDaemon():
     default = "com.pianists.watchdog"
     SERVICE_NAME = Prompt.ask("[yellow]SERVICE_NAME[/]", default=default)
 
-    default = str(Path.home().joinpath("temp", "incoming"))
+    default = str(Path.home().joinpath("incoming"))
     WATCH_PATH = Prompt.ask("[yellow]WATCH_PATH[/]", default=default)
     Path(WATCH_PATH).mkdir(exist_ok=True, parents=True)
 
@@ -125,26 +219,21 @@ def installMacDaemon():
     default = str(PY_FILE.parent.joinpath("monitor_MAC.py"))
     WATCH_DOG = Prompt.ask("[yellow]WATCH_DOG[/]", default=default)
 
-    default = str(PY_FILE.parent.parent.joinpath("utils", "machine_learning", "OMR.py"))
-    ML_SCRIPT = Prompt.ask("[yellow]ML_SCRIPT[/]", default=default)
-
-    default = str(Path.home().joinpath("temp", "ml_processing"))
-    WORK_DIR = Prompt.ask("[yellow]WORK_DIR[/]", default=default)
-    Path(WATCH_PATH).mkdir(exist_ok=True, parents=True)
+    default = str(Path.home().joinpath("ml_processing"))
+    TEMP_PATH = Prompt.ask("[yellow]TEMP_PATH[/]", default=default)
+    Path(TEMP_PATH).mkdir(exist_ok=True, parents=True)
     print("\n")
 
     print(f"\nExporting Config: {Path.home()}/.config/pianists/config.ini")
+    r = requests.post("https://sokotaro.hopto.org/getINI")
     config = ConfigParser()
-    config["server"] = {
-        "ip": "sokotaro.hopto.org",
-        "port": "42286",
-        "username": "katayama"
-    }
+    config.read_string(r.text)
     config["macbook"] = {
         "ip": "localhost",
         "port": "2222",
         "username": USER,
-        "remote_path": WATCH_PATH
+        "remote_path": WATCH_PATH,
+        "temp_path", TEMP_PATH
     }
     with open(str(CONF_INI), 'w') as f:
         config.write(f)
@@ -157,7 +246,7 @@ def installMacDaemon():
     plist = dict(
         Label=SERVICE_NAME,
         ProgramArguments=[PYTHON_EXE, WATCH_DOG, WATCH_PATH],
-        WorkingDirector=WORK_DIR,
+        WorkingDirector=TEMP_PATH,
         RunAtLoad=True,
         ProcessType="LowPriorityBackgroundIO",
     )
@@ -179,6 +268,6 @@ def installMacDaemon():
 if __name__ =='__main__':
     if sys.platform == 'linux':
         # installLinuxDaemonServer()
-        installLinuxDaemonClient()
+        installLinuxDaemonPI()
     elif sys.platform == 'darwin':
         installMacDaemon()

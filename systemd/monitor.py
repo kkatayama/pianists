@@ -9,6 +9,7 @@ from configparser import ConfigParser
 from paramiko import SSHClient
 from scp import SCPClient
 import subprocess
+import requests
 import logging
 import shutil
 import time
@@ -32,12 +33,18 @@ class MonitorChanges(PatternMatchingEventHandler):
     def on_created(self, event):
         """Delay after trigger"""
         if ".pdf" in event.src_path:
+            r = requests.post("https://sokotaro.hopto.org/getINI")
+            config = ConfigParser()
+            config.read_string(r.text)
+            host = dict(config["macbook"].items())
+
             src_file = Path(event.src_path)
             logger.info(f'PDF Item Created: "SCP to Server"')
             logger.info(event)
             time.sleep(4)
 
             # -- 1. move pdf file to TEMP_PATH
+            logger.info(f"moving {src_file.name} to {TEMP_PATH}")
             TEMP_PATH.mkdir(exist_ok=True)
             pdf_file = shutil.move(src_file, TEMP_PATH)
 
@@ -98,10 +105,6 @@ class MonitorChanges(PatternMatchingEventHandler):
 
 if __name__ == '__main__':
     # -- GLOBALS -- #
-    config = ConfigParser()
-    # config.read(Path(Path.cwd(), "systemd", "hosts.ini"))
-    config.read(Path.home().joinpath(".config", "pianists", "config.ini"))
-    host = dict(config["macbook"].items())
     BASE_PATH = Path.cwd()
     WATCH_PATH = Path.cwd().joinpath("pdf_outgoing")
     TEMP_PATH = Path.cwd().joinpath("systemd", "ml_results")

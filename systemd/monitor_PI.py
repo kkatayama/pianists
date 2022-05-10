@@ -1,17 +1,21 @@
 from pathlib import Path
 import sys
-sys.path.append(str(Path.cwd()))
+sys.path.append(str(Path(__file__).absolute().parents[1].joinpath('utils')))
 
 from watchdog.events import PatternMatchingEventHandler
 from watchdog.observers import Observer
-from utils.log_handler import getLogger
+from log_handler import getLogger
 from configparser import ConfigParser
-from paramiko import SSHClient
-from scp import SCPClient
-import subprocess
+from pathlib import Path
+import pandas as pd
+import requests
+import argparse
 import logging
 import shutil
+import json
 import time
+import sys
+import os
 
 
 def compress(source: Path, destination: Path):
@@ -31,89 +35,82 @@ class MonitorChanges(PatternMatchingEventHandler):
 
     def on_created(self, event):
         """Delay after trigger"""
-        if ".pdf" in event.src_path:
+        if ".zip" in event.src_path:
             src_file = Path(event.src_path)
-            logger.info(f'PDF Item Created: "SCP to Server"')
-            logger.info(event)
+            logger.info(f'detected zip file: {src_file}')
             time.sleep(4)
 
-            # -- 1. move pdf file to TEMP_PATH
+            # -- CONFIGS -- #
+            r = requests.post("https://sokotaro.hopto.org/getINI")
+            config = ConfigParser()
+            config.read_string(r.text)
+            macbook = dict(config["macbook"].items())
+            server = dict(config["server"].items())
+            pi = dict(config["pi"].items())
+            TEMP_PATH = Path(macbook["temp_path"])
+
+            # -- 1. move zip file to TEMP_PATH
+            logger.info(f"moving {src_file.name} to {TEMP_PATH}")
             TEMP_PATH.mkdir(exist_ok=True)
-            pdf_file = shutil.move(src_file, TEMP_PATH)
+            zip_file = shutil.move(src_file, TEMP_PATH)
 
-            # -- 2. run audiveris on the odf file
-            OMR_RESULTS = Path(TEMP_PATH, "omr_results")
-            OMR_RESULTS.mkdir(exist_ok=True)
-            cmd = ["audiveris", "-batch", "-transcribe", "-export", f"{pdf_file}", "-output", f"{OMR_RESULTS}"]
+            # -- 2. extract zip file
+            logger.info(f'extracting: {zip_file}')
+            extract(Path(zip_file), TEMP_PATH)
+            cmd = ["ls", "-lh", "*/*"]
             logger.info(cmd)
             p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
             for line in iter(p.stdout.readline, b''):
                 response = line.decode().strip()
                 logger.debug(response)
 
-            # -- 3. parse mxl and extract notes
-            # os.chdir(f"{OMR_RESULTS}")
-            PARSE_MXL = BASE_PATH.joinpath("utils", "parse_mxl.py")
-            cmd = [PARSE_MXL, f'{next(OMR_RESULTS.rglob("*.mxl"))}', f'{OMR_RESULTS}']
+            # -- 3. parse signature and notes
+            CSV_FILE = f'{next(TEMP_PATH.rglob("*.csv"))}'
+            JSON_FILE = f'{next(TEMP_PATH.rglob("*.json"))}'
+            logger.info(f'parsing signature: {JSON_FILE}')
+            with open(JSON_FILE) as f:
+                data = json.load(f)
+            temp_key = data["key_signatures"][0]
+            temp_time = data["time_signatures"][0]
+            key_signature = f'{temp_key["root_str"]} {temp_key["mode"]}'
+            time_signature = f'{temp_time["numerator]}/{temp_time["denominator"]}'
+            logger.debug(f'key_signature: {key_signature}')
+            logger.debug(f'time_signature: {time_signature}')
+
+            logger.info(f'parsing notes: {CSV_FILE}')
+            df = pd.read_csv(CSV_FILE, header=0)
+            for index, note in df.iterrows():
+                logger.debug(f'{note["pitch_str"]} (duration: {note["duration"]})')
+
+            # -- 4. parse drawings and do more machine learning ...?
+
+            # -- 5. generate p-code ...
+            logger.info(f'generating p-code ...')
+
+            # -- 6. send p-code to raspberry pi
+            logger.info(f'Sending p-code File: {CSV_FILE}')
+            cmd = f"rsync -v -e 'ssh -A -t -p {server['port']} {server['username']}@{server['ip']} ssh -A -t -p {udel['port']} {pi['username']}@{pi['ip']}' {str(pdf_file)} :{pi['remote_path']}/temp.pdf"
             logger.info(cmd)
-            p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-            for line in iter(p.stdout.readline, b''):
-                response = line.decode().strip()
-                logger.debug(response)
-
-            # -- 4. crop image drawings
-            # os.chdir(f"{TEMP_PATH}")
-            CROP_IMG = BASE_PATH.joinpath("utils", "extract_pdf_drawings.py")
-            cmd = [CROP_IMG, f'{pdf_file}', f'{TEMP_PATH}']
-            logger.info(cmd)
-            p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-            for line in iter(p.stdout.readline, b''):
-                response = line.decode().strip()
-                logger.debug(response)
-
-            # -- 5. compress files to a .zip archive
-            # os.chdir(f'{TEMP_PATH.parent}')
-            logger.info("compressing files: systemd/ml_results.zip")
-            zip_file = compress(TEMP_PATH, TEMP_PATH.parent.joinpath('ml_results.zip'))
-
-            # -- 6. clean-up (delete all files)
-            # os.chdir(f'{TEMP_PATH.parent}')
-            logger.info("deleting ml files: systemd/ml_results")
-            shutil.rmtree(TEMP_PATH)
-            TEMP_PATH.mkdir(exist_ok=True)
-
-            # -- 7. send file
-            logger.info(f'Sending File: {zip_file}')
-            logger.debug(f'host: {host}')
-            with SSHClient() as ssh:
-                ssh.load_system_host_keys()
-                ssh.connect(hostname=host['ip'], port=host['port'], username=host['username'])
-                with SCPClient(ssh.get_transport()) as scp:
-                    scp.put(files=str(zip_file), remote_path=host['remote_path'], recursive=False)
+            os.system(cmd)
             time.sleep(2)
 
-            logger.info(f"Deleting File: {zip_file}")
-            Path(zip_file).unlink()
 
 
 if __name__ == '__main__':
-    # -- GLOBALS -- #
+    # -- CONFIGS -- #
+    r = requests.post("https://sokotaro.hopto.org/getINI")
     config = ConfigParser()
-    config.read(Path(Path.cwd(), "systemd", "hosts.ini"))
-    host = dict(config["macbook"].items())
-    BASE_PATH = Path.cwd()
-    WATCH_PATH = Path.cwd().joinpath("pdf_outgoing")
-    TEMP_PATH = Path.cwd().joinpath("systemd", "ml_results")
+    config.read_string(r.text)
+    macbook = dict(config["macbook"].items())
     logger = getLogger()
+    WATCH_PATH = Path(macbook["remote_path"])
 
     # -- SETUP -- #
     WATCH_PATH.mkdir(exist_ok=True)
-    event_handler = MonitorChanges(patterns=["*.pdf"], ignore_patterns=["*.py", "*.db"], ignore_directories=True)
+    event_handler = MonitorChanges(patterns=["*.zip"], ignore_directories=True)
     observer = Observer()
     observer.schedule(event_handler, str(WATCH_PATH), recursive=True)
     observer.start()
-
-    # -- WATCHDOG -- #
     try:
         while True:
             time.sleep(1)
