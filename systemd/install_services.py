@@ -163,7 +163,7 @@ def installMacDaemon():
     )
     print(plistlib.dumps(plist).decode())
     SERVICE_PATH = str(Path.home().joinpath("Library", "LaunchAgents", f"{SERVICE_NAME}"))
-    with open(f"{SERVICE_PATH}.plist", 'w') as f:
+    with open(f"{SERVICE_PATH}.plist", 'wb') as f:
         plistlib.dump(plist, f)
 
     print("\nStarting LaunchAgent Daemon!")
