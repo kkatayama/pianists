@@ -140,7 +140,7 @@ def installLinuxDaemonPI():
     print("\n")
 
     print(f"\nExporting Config: {Path.home()}/.config/pianists/config.ini")
-    r = requests.post("https://sokotaro.hopto.org/getINI")
+    r = requests.get("https://pianists.hopto.org/getINI")
     config = ConfigParser()
     config.read_string(r.text)
     config["pi"] = {
@@ -236,7 +236,7 @@ def installMacDaemon():
     print("\n")
 
     print(f"\nExporting Config: {Path.home()}/.config/pianists/config.ini")
-    r = requests.post("https://sokotaro.hopto.org/getINI")
+    r = requests.get("https://pianists.hopto.org/getINI")
     config = ConfigParser()
     config.read_string(r.text)
     config["macbook"] = {
