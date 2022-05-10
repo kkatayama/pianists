@@ -2,6 +2,8 @@ from pathlib import Path
 import sys
 sys.path.append(str(Path(__file__).absolute().parents[1].joinpath('utils')))
 
+from paramiko import SSHClient, AutoAddPolicy, RSAKey
+from scp import SCPClient
 from watchdog.events import PatternMatchingEventHandler
 from watchdog.observers import Observer
 from log_handler import getLogger
