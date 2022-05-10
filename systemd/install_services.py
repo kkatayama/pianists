@@ -156,6 +156,7 @@ def installLinuxDaemonPI():
     print("\nNotify Server")
     r = requests.post("https://sokotaro.hopto.org/addPI", params=dict(config["pi"]))
 
+    """
     print("\nExporting Service Daemon!")
     conf = ConfigParser()
     conf.optionxform = str
@@ -200,7 +201,7 @@ def installLinuxDaemonPI():
     cmd = "sudo systemctl start monitor_pi"
     subprocess.run(cmd, shell=True, capture_output=True, text=True)
     print(cmd)
-
+    """
 
 def installMacDaemon():
     # Extract Current User Info Running This Script ###############################
@@ -251,7 +252,7 @@ def installMacDaemon():
     print("\nNotify Server")
     r = requests.post("https://sokotaro.hopto.org/addMacbook", params=dict(config["macbook"]))
 
-
+    """
     print("\nExporting LaunchAgent Daemon!")
     plist = dict(
         Label=SERVICE_NAME,
@@ -273,6 +274,7 @@ def installMacDaemon():
     cmd = f"launchctl kickstart -kp gui/{UID}/{SERVICE_NAME}"
     subprocess.run(cmd, shell=True, capture_output=True, text=True)
     print(cmd)
+    """
 
 
 if __name__ =='__main__':
