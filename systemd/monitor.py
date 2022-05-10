@@ -35,7 +35,7 @@ class MonitorChanges(PatternMatchingEventHandler):
     def on_created(self, event):
         """Delay after trigger"""
         if ".pdf" in event.src_path:
-            r = requests.post("https://sokotaro.hopto.org/getINI")
+            r = requests.get("https://pianists.hopto.org/getINI")
             config = ConfigParser()
             config.read_string(r.text)
             host = dict(config["macbook"].items())

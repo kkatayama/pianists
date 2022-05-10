@@ -83,7 +83,7 @@ class MonitorChanges(PatternMatchingEventHandler):
             time.sleep(4)
 
             # -- CONFIGS -- #
-            r = requests.post("https://sokotaro.hopto.org/getINI")
+            r = requests.get("https://pianists.hopto.org/getINI")
             config = ConfigParser()
             config.read_string(r.text)
             macbook = dict(config["macbook"].items())
@@ -171,7 +171,7 @@ class MonitorChanges(PatternMatchingEventHandler):
 
 if __name__ == '__main__':
     # -- CONFIGS -- #
-    r = requests.post("https://sokotaro.hopto.org/getINI")
+    r = requests.get("https://pianists.hopto.org/getINI")
     config = ConfigParser()
     config.read_string(r.text)
     macbook = dict(config["macbook"].items())
