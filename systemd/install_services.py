@@ -3,6 +3,7 @@ from configparser import ConfigParser
 from pathlib import Path
 import subprocess
 import plistlib
+import platform
 import shutil
 import sys
 import pip
@@ -13,7 +14,12 @@ import os
 cmd = f'{sys.executable} -m pip install -U pip'
 print(cmd)
 os.system(cmd)
-for pkg in ["watchdog", "rich", "paramiko", "scp", "coloredlogs", "requests", "pandas"]:
+
+if 'arm' not in platform.platform():
+    packages = ["watchdog", "rich", "paramiko", "scp", "coloredlogs", "requests", "pandas"]
+else:
+    packages = ["watchdog", "rich", "paramiko", "scp", "coloredlogs", "requests"]
+for pkg in packages:
     try:
         exec(f'import {pkg}')
     except ImportError:

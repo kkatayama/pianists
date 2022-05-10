@@ -43,10 +43,10 @@ class MonitorChanges(PatternMatchingEventHandler):
             ###################################################################
 
             # -- 2. parse pcode file
-            logger.info(f'parsing pcode file: {CSV_FILE}')
-            df = pd.read_csv(pcode_file, header=0)
-            for index, note in df.iterrows():
-                logger.debug(f'{note["pitch_str"]} (duration: {note["duration"]})')
+            logger.info(f'parsing pcode file: {pcode_file}')
+            with open(pcode_file) as f:
+                data = f.read()
+            logger.debug(data)
 
             # -- 3. send pcode instructions ... ?
 
