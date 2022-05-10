@@ -68,12 +68,19 @@ class MonitorChanges(PatternMatchingEventHandler):
             logger.info(f'parsing signature: {JSON_FILE}')
             with open(JSON_FILE) as f:
                 data = json.load(f)
-            temp_key = data["key_signatures"][0]
-            temp_time = data["time_signatures"][0]
-            key_signature = f'{temp_key["root_str"]} {temp_key["mode"]}'
-            time_signature = f'{temp_time["numerator"]}/{temp_time["denominator"]}'
-            logger.debug(f'key_signature: {key_signature}')
-            logger.debug(f'time_signature: {time_signature}')
+            try:
+                temp_key = data["key_signatures"][0]
+                key_signature = f'{temp_key["root_str"]} {temp_key["mode"]}'
+                logger.debug(f'key_signature: {key_signature}')
+            except Exception:
+                pass
+
+            try:
+                temp_time = data["time_signatures"][0]
+                time_signature = f'{temp_time["numerator"]}/{temp_time["denominator"]}'
+                logger.debug(f'time_signature: {time_signature}')
+            except Exception:
+                pass
 
             logger.info(f'parsing notes: {CSV_FILE}')
             df = pd.read_csv(str(CSV_FILE), header=0)
@@ -106,15 +113,6 @@ class MonitorChanges(PatternMatchingEventHandler):
             TEMP_PATH.mkdir(exist_ok=True)
             shutil.rmtree(str(WATCH_PATH))
             WATCH_PATH.mkdir(exist_ok=True)
-
-    def on_deleted(event):
-        logger.info(event)
-
-    def on_modified(event):
-        logger.info(event)
-
-    def on_moved(event):
-        logger.info(event)
 
 
 if __name__ == '__main__':

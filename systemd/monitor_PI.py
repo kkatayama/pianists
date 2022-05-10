@@ -57,15 +57,6 @@ class MonitorChanges(PatternMatchingEventHandler):
             shutil.rmtree(str(WATCH_PATH))
             WATCH_PATH.mkdir(exist_ok=True)
 
-    def on_deleted(event):
-        logger.info(event)
-
-    def on_modified(event):
-        logger.info(event)
-
-    def on_moved(event):
-        logger.info(event)
-
 
 if __name__ == '__main__':
     # -- CONFIGS -- #
