@@ -16,7 +16,8 @@ import os
 
 # -- CONFIGS -- #
 config = ConfigParser()
-config.read(Path(Path.cwd(), "systemd", "hosts.ini"))
+# config.read(Path(Path.cwd(), "systemd", "hosts.ini"))
+config.read(Path.home().joinpath(".config", "pianists", "config.ini"))
 server = dict(config["server"].items())
 udel = dict(config["udel"].items())
 

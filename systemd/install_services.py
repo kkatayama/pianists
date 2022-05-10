@@ -1,9 +1,5 @@
 #!/usr/bin/env python3
 from configparser import ConfigParser
-from rich.console import Console
-from rich.prompt import Prompt
-from rich.panel import Panel
-from rich.text import Text
 from pathlib import Path
 import subprocess
 import plistlib
@@ -14,23 +10,32 @@ import os
 
 
 # Attempt to Import Dependencies, Otherwise Install ###########################
-for pkg in ["watchdog", "git", "rich", "paramiko", "scp", "coloredlogs"]:
+for pkg in ["watchdog", "git", "rich", "paramiko", "scp", "coloredlogs", "requests"]:
     try:
         exec(f'import {pkg}')
     except ImportError:
         pip.main(["install", "-U", pkg])
 
+from rich.console import Console
+from rich.prompt import Prompt
+from rich.panel import Panel
+from rich.text import Text
 from rich import print
-py_file = Path(__file__)
-pwd = py_file.parent.parent
+import requests
+
+CONF_PATH = Path.home().joinpath(".config", "pianists")
+CONF_PATH.mkdir(exist_ok=True, parents=True)
+CONF_INI = CONF_PATH.joinpath("config.ini")
+PY_FILE = Path(__file__).absolute()
+PWD = PY_FILE.parent.parent
 
 
-def installLinuxDaemon():
+def installLinuxDaemonServer():
     # Extract Current User Info Running This Script ###############################
     user = os.environ.get("USER")
-    wd = pwd.as_posix()
+    wd = PWD.as_posix()
     py = sys.executable
-    app = next(Path(pwd).rglob('server.py')).absolute().as_posix()
+    app = next(Path(PWD).rglob('server.py')).absolute().as_posix()
     conf = next(Path().rglob('pianists_service.conf')).absolute().as_posix()
     monitor = next(Path().rglob('monitor.py')).absolute().as_posix()
 
@@ -83,13 +88,19 @@ def installLinuxDaemon():
         subprocess.run(cmd, shell=True, capture_output=True, text=True)
         print(cmd)
 
+    conf = ConfigParser()
+    conf["server"] = {
+        "ip": "sokotaro.hopto.org",
+        "port": "42286",
+        "username": "katayama"
+    }
+    with open(str(CONF_INI), 'w') as f:
+        conf.write(f)
 
 
 def installMacDaemon():
     # Extract Current User Info Running This Script ###############################
     c = Console()
-    py_file = Path.cwd().joinpath("install_daemon_and_watchdog_LINUX.py")
-
     text = Text.assemble(
         ("Configure Setup: ", "magenta"),
         ("(press enter to select default value)", "green"),
@@ -97,29 +108,52 @@ def installMacDaemon():
     )
     c.print(Panel(text, width=80))
 
-    # default = os.environ.get("USER")
-    # USER = Prompt.ask("[yellow]USER[/]", default=default)
+    default = os.environ.get("USER")
+    USER = Prompt.ask("[yellow]USER[/]", default=default)
     UID = os.getuid()
 
     default = "com.pianists.watchdog"
     SERVICE_NAME = Prompt.ask("[yellow]SERVICE_NAME[/]", default=default)
 
-    default = str(Path.home().joinpath("temp", "incoming_sheet_music"))
+    default = str(Path.home().joinpath("temp", "incoming"))
     WATCH_PATH = Prompt.ask("[yellow]WATCH_PATH[/]", default=default)
-    Path(WATCH_PATH).mkdir(exist_ok=True)
+    Path(WATCH_PATH).mkdir(exist_ok=True, parents=True)
 
     default = sys.executable
     PYTHON_EXE = Prompt.ask("[yellow]PYTHON_EXE[/]", default=default)
 
-    default = str(py_file.parent.joinpath("monitor_MAC.py"))
+    default = str(PY_FILE.parent.joinpath("monitor_MAC.py"))
     WATCH_DOG = Prompt.ask("[yellow]WATCH_DOG[/]", default=default)
 
-    default = str(py_file.parent.parent.joinpath("utils", "machine_learning", "OMR.py"))
+    default = str(PY_FILE.parent.parent.joinpath("utils", "machine_learning", "OMR.py"))
     ML_SCRIPT = Prompt.ask("[yellow]ML_SCRIPT[/]", default=default)
 
-    WORK_DIR = str(Path(ML_SCRIPT).parent)
+    default = str(Path.home().joinpath("temp", "ml_processing"))
+    WORK_DIR = Prompt.ask("[yellow]WORK_DIR[/]", default=default)
+    Path(WATCH_PATH).mkdir(exist_ok=True, parents=True)
     print("\n")
 
+    print(f"\nExporting Config: {Path.home()}/.config/pianists/config.ini")
+    config = ConfigParser()
+    config["server"] = {
+        "ip": "sokotaro.hopto.org",
+        "port": "42286",
+        "username": "katayama"
+    }
+    config["macbook"] = {
+        "ip": "localhost",
+        "port": "2222",
+        "username": USER,
+        "remote_path": WATCH_PATH
+    }
+    with open(str(CONF_INI), 'w') as f:
+        config.write(f)
+
+    print("\nNotify Server")
+    r = requests.post("https://sokotaro.hopto.org/addMacbook", params=dict(config["macbook"]))
+
+
+    print("\nExporting LaunchAgent Daemon!")
     plist = dict(
         Label=SERVICE_NAME,
         ProgramArguments=[PYTHON_EXE, WATCH_DOG, WATCH_PATH],
@@ -127,13 +161,12 @@ def installMacDaemon():
         RunAtLoad=True,
         ProcessType="LowPriorityBackgroundIO",
     )
-
-    print("\nExporting LaunchAgent Daemon!")
     print(plistlib.dumps(plist).decode())
     SERVICE_PATH = str(Path.home().joinpath("Library", "LaunchAgents", f"{SERVICE_NAME}"))
     with open(f"{SERVICE_PATH}.plist", 'w') as f:
         plistlib.dump(plist, f)
 
+    print("\nStarting LaunchAgent Daemon!")
     cmd = f"launchctl bootstrap gui/{UID} {SERVICE_PATH}.plist"
     subprocess.run(cmd, shell=True, capture_output=True, text=True)
     print(cmd)
@@ -145,6 +178,7 @@ def installMacDaemon():
 
 if __name__ =='__main__':
     if sys.platform == 'linux':
-        installLinuxDaemon()
+        # installLinuxDaemonServer()
+        installLinuxDaemonClient()
     elif sys.platform == 'darwin':
         installMacDaemon()

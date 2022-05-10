@@ -1,10 +1,10 @@
 from pathlib import Path
 import sys
-sys.path.append(str(Path(__file__).absolute().parents[1].joinpath('utils')))
+sys.path.append(str(Path.cwd()))
 
 from watchdog.events import PatternMatchingEventHandler
 from watchdog.observers import Observer
-from log_handler import getLogger
+from utils.log_handler import getLogger
 from configparser import ConfigParser
 from paramiko import SSHClient
 from scp import SCPClient
@@ -99,8 +99,7 @@ class MonitorChanges(PatternMatchingEventHandler):
 if __name__ == '__main__':
     # -- GLOBALS -- #
     config = ConfigParser()
-    # config.read(Path(Path.cwd(), "systemd", "hosts.ini"))
-    config.read(Path.home().joinpath(".config", "pianists", "config.ini"))
+    config.read(Path(Path.cwd(), "systemd", "hosts.ini"))
     host = dict(config["macbook"].items())
     BASE_PATH = Path.cwd()
     WATCH_PATH = Path.cwd().joinpath("pdf_outgoing")
