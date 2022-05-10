@@ -151,7 +151,7 @@ class MonitorChanges(PatternMatchingEventHandler):
             cmd = f"rsync -v -e 'ssh -A -t -p {server['port']} {server['username']}@{server['ip']} ssh -A -t -p {pi['port']} {pi['username']}@{pi['ip']}' {PCODE_FILE} :{pi['remote_path']}/{PCODE_FILE.name}"
             logger.info(cmd)
             os.system(cmd)
-            time.sleep(2)
+            time.sleep(10)
 
             # -- 7. touch p-code file on raspberry pi
             logger.info(f'touch p-code file: {PCODE_FILE}')
