@@ -35,6 +35,7 @@ class MonitorChanges(PatternMatchingEventHandler):
 
             # -- 1. move pcode file to TEMP_PATH
             logger.info(f"moving {src_file.name} to {TEMP_PATH}")
+            shutil.rmtree(str(TEMP_PATH))
             TEMP_PATH.mkdir(exist_ok=True)
             pcode_file = shutil.move(str(src_file), str(TEMP_PATH))
 

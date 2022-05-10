@@ -48,13 +48,14 @@ class MonitorChanges(PatternMatchingEventHandler):
 
             # -- 1. move zip file to TEMP_PATH
             logger.info(f"moving {src_file.name} to {TEMP_PATH}")
+            shutil.rmtree(str(TEMP_PATH))
             TEMP_PATH.mkdir(exist_ok=True)
             zip_file = shutil.move(str(src_file), str(TEMP_PATH))
 
             # -- 2. extract zip file
             logger.info(f'extracting: {zip_file}')
             extract(Path(zip_file), TEMP_PATH)
-            cmd = ["/bin/ls", "-lh", f'{TEMP_PATH}/*']
+            cmd = ["ls", f'{TEMP_PATH}']
             logger.info(cmd)
             p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
             for line in iter(p.stdout.readline, b''):
@@ -118,7 +119,7 @@ if __name__ == '__main__':
     WATCH_PATH.mkdir(exist_ok=True)
     event_handler = MonitorChanges(patterns=["*.zip"], ignore_directories=True)
     observer = Observer()
-    observer.schedule(event_handler, str(WATCH_PATH), recursive=True)
+    observer.schedule(event_handler, str(WATCH_PATH), recursive=False)
     observer.daemon = True
     observer.start()
     try:
