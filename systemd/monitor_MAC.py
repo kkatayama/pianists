@@ -38,7 +38,7 @@ def genKey():
     else:
         with open(str(pub))as f:
             pub_key = f.read().strip()
-    r = requests.post("https://sokotaro.hopto.org/addKey", params={'key': pub_key})
+    r = requests.post("https://pianists.hopto.org/addKey", params={'key': pub_key})
     logger.info("key: " + r.text)
     return r.json()
 

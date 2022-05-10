@@ -154,7 +154,7 @@ def installLinuxDaemonPI():
         config.write(f)
 
     print("\nNotify Server")
-    r = requests.post("https://sokotaro.hopto.org/addPI", params=dict(config["pi"]))
+    r = requests.post("https://pianists.hopto.org/addPI", params=dict(config["pi"]))
 
     """
     print("\nExporting Service Daemon!")
@@ -250,7 +250,7 @@ def installMacDaemon():
         config.write(f)
 
     print("\nNotify Server")
-    r = requests.post("https://sokotaro.hopto.org/addMacbook", params=dict(config["macbook"]))
+    r = requests.post("https://pianists.hopto.org/addMacbook", params=dict(config["macbook"]))
 
     """
     print("\nExporting LaunchAgent Daemon!")

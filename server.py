@@ -42,6 +42,61 @@ def commands():
         res = json.load(f)
     return res
 
+###############################################################################
+#                              Add Pianists Hosts                             #
+###############################################################################
+@app.route('/addMacbook', method=["POST"])
+def addMacbook():
+    params = dict(request.params)
+    CONFIG_INI = Path.home().joinpath(".config", "pianists", "config.ini")
+    config = ConfigParser()
+    config.read(str(CONFIG_INI))
+    config["macbook"] = {
+        "ip": params["ip"],
+        "port": params["port"],
+        "username": params["username"],
+        "remote_path": params["remote_path"],
+        "temp_path": params["temp_path"]
+    }
+    with open(str(CONFIG_INI), 'w') as f:
+        config.write(f)
+    os.system('sudo systemctl restart monitor.service')
+
+@app.route('/addPI', method=["POST"])
+def addPI():
+    params = dict(request.params)
+    CONFIG_INI = Path.home().joinpath(".config", "pianists", "config.ini")
+    config = ConfigParser()
+    config.read(str(CONFIG_INI))
+    config["pi"] = {
+        "ip": params["ip"],
+        "port": params["port"],
+        "username": params["username"],
+        "remote_path": params["remote_path"],
+        "temp_path": params["temp_path"]
+    }
+    with open(str(CONFIG_INI), 'w') as f:
+        config.write(f)
+    os.system('sudo systemctl restart monitor.service')
+
+@app.route('/addKey', method=["POST"])
+def addKey():
+    status = ""
+    params = dict(request.params)
+    auth_keys = str(Path.home().joinpath(".ssh", "authorized_keys"))
+    with open(auth_keys) as f:
+        for line in f:
+            if params["key"] == line.strip():
+                status = "exists"
+    if not status:
+        status = "added"
+        with open(auth_keys, 'a') as f:
+            f.write(params["key"] + "\n")
+    with open(Path.home().joinpath(".ssh", "id_rsa.pub")) as f:
+        pub_key = f.read().strip()
+    return {"status": status, "key": pub_key}
+
+
 @app.route('/getINI', method=["GET", "POST"])
 def getINI():
     CONFIG_INI = Path.home().joinpath(".config", "pianists", "config.ini")
