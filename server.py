@@ -8,7 +8,7 @@ from utils.db_functions import (
     checkUserAgent, log_to_logger, ErrorsRestPlugin
 )
 from utils.secret import secret_key
-
+from configparser import ConfigParser
 from itertools import chain
 from datetime import datetime
 from pathlib import Path
