@@ -50,7 +50,7 @@ class MonitorChanges(PatternMatchingEventHandler):
             TEMP_PATH.mkdir(exist_ok=True)
             pdf_file = shutil.move(str(src_file), str(TEMP_PATH))
 
-            # -- 2. run audiveris on the odf file
+            # -- 2. run audiveris on the pdf file
             OMR_RESULTS = Path(TEMP_PATH, "omr_results")
             OMR_RESULTS.mkdir(exist_ok=True)
             cmd = ["audiveris", "-batch", "-transcribe", "-export", f"{pdf_file}", "-output", f"{OMR_RESULTS}"]
@@ -105,6 +105,15 @@ class MonitorChanges(PatternMatchingEventHandler):
             logger.info(f"Deleting File: {zip_file}")
             Path(zip_file).unlink()
 
+    def on_deleted(event):
+        logger.info(event)
+
+    def on_modified(event):
+        logger.info(event)
+
+    def on_moved(event):
+        logger.info(event)
+
 
 if __name__ == '__main__':
     # -- GLOBALS -- #
@@ -115,10 +124,10 @@ if __name__ == '__main__':
 
     # -- SETUP -- #
     WATCH_PATH.mkdir(exist_ok=True)
-    event_handler = MonitorChanges(patterns=["*.pdf"], ignore_patterns=["*.py", "*.db"], ignore_directories=True)
+    event_handler = MonitorChanges(patterns=["*.pdf"], ignore_patterns="", ignore_directories=True)
     observer = Observer()
     observer.schedule(event_handler, str(WATCH_PATH), recursive=True)
-    observer.daemon = True
+    # observer.daemon = True
     observer.start()
 
     # -- WATCHDOG -- #

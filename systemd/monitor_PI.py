@@ -57,6 +57,16 @@ class MonitorChanges(PatternMatchingEventHandler):
             shutil.rmtree(str(WATCH_PATH))
             WATCH_PATH.mkdir(exist_ok=True)
 
+    def on_deleted(event):
+        logger.info(event)
+
+    def on_modified(event):
+        logger.info(event)
+
+    def on_moved(event):
+        logger.info(event)
+
+
 if __name__ == '__main__':
     # -- CONFIGS -- #
     r = requests.post("https://sokotaro.hopto.org/getINI")
@@ -70,10 +80,10 @@ if __name__ == '__main__':
     WATCH_PATH.mkdir(exist_ok=True)
     shutil.rmtree(str(WATCH_PATH))
     WATCH_PATH.mkdir(exist_ok=True)
-    event_handler = MonitorChanges(patterns=["*.pcode"], ignore_directories=True)
+    event_handler = MonitorChanges(patterns=["*.pcode"], ignore_patterns="", ignore_directories=True)
     observer = Observer()
     observer.schedule(event_handler, str(WATCH_PATH), recursive=True)
-    observer.daemon = True
+    # observer.daemon = True
     observer.start()
     try:
         while True:
