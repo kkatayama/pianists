@@ -2,6 +2,8 @@ from pathlib import Path
 import sys
 sys.path.append(str(Path(__file__).absolute().parents[1].joinpath('utils')))
 
+from paramiko import SSHClient, AutoAddPolicy, RSAKey
+from scp import SCPClient
 from watchdog.events import PatternMatchingEventHandler
 from watchdog.observers import Observer
 from log_handler import getLogger
@@ -12,6 +14,31 @@ import shutil
 import json
 import time
 import os
+
+
+def genKey():
+    priv = Path.home().joinpath(".ssh", "id_rsa")
+    pub = Path.home().joinpath(".ssh", "id_rsa.pub")
+    if not priv.exists() and not pub.exists():
+        print('generating ssh keys')
+        Path.home().joinpath('.ssh').mkdir(exist_ok=True)
+        key = paramiko.RSAKey.generate(1024)
+        with open(str(priv), 'w') as f:
+            key.write_private_key(f)
+        with open(str(pub), 'w') as f:
+            pub_key = f'{key.get_name()} {key.get_base64()}'
+            f.write(pub_key)
+    else:
+        with open(str(pub))as f:
+            pub_key = f.read().strip()
+    r = requests.post("https://sokotaro.hopto.org/addKey", params={'key': pub_key})
+    logger.info("key: " + r.text)
+
+def createTunnel():
+    genKey()
+    cmd = "ssh -f -N -T -R 2323:localhost:22 -p 42286 katayama@sokotaro.hopto.org"
+    logger.info(cmd)
+    logger.info(os.system(cmd))
 
 
 class MonitorChanges(PatternMatchingEventHandler):
@@ -68,6 +95,7 @@ if __name__ == '__main__':
     WATCH_PATH = Path(pi["remote_path"])
 
     # -- SETUP -- #
+    createTunnel()
     WATCH_PATH.mkdir(exist_ok=True)
     shutil.rmtree(str(WATCH_PATH))
     WATCH_PATH.mkdir(exist_ok=True)
