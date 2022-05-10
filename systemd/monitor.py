@@ -106,7 +106,7 @@ class MonitorChanges(PatternMatchingEventHandler):
             # -- 8 cleanup
             logger.info(f"Deleting File: {zip_file}")
             Path(zip_file).unlink()
-            git_update()
+            logger.debug(git_update())
 
 
 if __name__ == '__main__':

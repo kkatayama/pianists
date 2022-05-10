@@ -158,8 +158,8 @@ class MonitorChanges(PatternMatchingEventHandler):
             logger.info(f"deleting ml files: {TEMP_PATH}")
             shutil.rmtree(str(TEMP_PATH))
             TEMP_PATH.mkdir(exist_ok=True)
-            shutil.rmtree(str(WATCH_PATH))
-            WATCH_PATH.mkdir(exist_ok=True)
+            # shutil.rmtree(str(WATCH_PATH))
+            # WATCH_PATH.mkdir(exist_ok=True)
 
 
 if __name__ == '__main__':
