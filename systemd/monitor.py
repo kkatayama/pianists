@@ -87,13 +87,13 @@ class MonitorChanges(PatternMatchingEventHandler):
             logger.debug(f'host: {host}')
             with SSHClient() as ssh:
                 ssh.load_system_host_keys()
-                logger.info(ssh.connect(hostname=host['ip'], port=host['port'], username=host['username']))
+                ssh.connect(hostname=host['ip'], port=host['port'], username=host['username'])
                 with SCPClient(ssh.get_transport()) as scp:
-                    logger.debug(scp.put(files=str(zip_file), remote_path=host['remote_path'], recursive=False))
+                    scp.put(files=str(zip_file), remote_path=host['remote_path'], recursive=False)
             time.sleep(2)
 
             logger.info(f"Deleting File: {zip_file}")
-            zip_file.unlink()
+            Path(zip_file).unlink()
 
 
 if __name__ == '__main__':
