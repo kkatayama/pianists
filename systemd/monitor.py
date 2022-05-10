@@ -46,13 +46,14 @@ class MonitorChanges(PatternMatchingEventHandler):
 
             # -- 1. move pdf file to TEMP_PATH
             logger.info(f"moving {src_file.name} to {TEMP_PATH}")
+            shutil.rmtree(str(TEMP_PATH))
             TEMP_PATH.mkdir(exist_ok=True)
             pdf_file = shutil.move(str(src_file), str(TEMP_PATH))
 
             # -- 2. run audiveris on the odf file
             OMR_RESULTS = Path(TEMP_PATH, "omr_results")
             OMR_RESULTS.mkdir(exist_ok=True)
-            cmd = ["/usr/local/bin/audiveris", "-batch", "-transcribe", "-export", f"{pdf_file}", "-output", f"{OMR_RESULTS}"]
+            cmd = ["audiveris", "-batch", "-transcribe", "-export", f"{pdf_file}", "-output", f"{OMR_RESULTS}"]
             logger.info(' '.join(cmd))
             # os.system(' '.join(cmd))
             p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
