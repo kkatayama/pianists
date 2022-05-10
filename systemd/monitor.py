@@ -61,7 +61,7 @@ class MonitorChanges(PatternMatchingEventHandler):
             # -- 3. parse mxl and extract notes
             # os.chdir(f"{OMR_RESULTS}")
             PARSE_MXL = BASE_PATH.joinpath("utils", "parse_mxl.py")
-            cmd = [PARSE_MXL, f'{next(OMR_RESULTS.rglob("*.mxl"))}', f'{OMR_RESULTS}']
+            cmd = [str(PARSE_MXL), str(next(OMR_RESULTS.rglob("*.mxl"))), str(OMR_RESULTS)]
             logger.info(cmd)
             p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
             for line in iter(p.stdout.readline, b''):
@@ -71,7 +71,7 @@ class MonitorChanges(PatternMatchingEventHandler):
             # -- 4. crop image drawings
             # os.chdir(f"{TEMP_PATH}")
             CROP_IMG = BASE_PATH.joinpath("utils", "extract_pdf_drawings.py")
-            cmd = [CROP_IMG, f'{pdf_file}', f'{TEMP_PATH}']
+            cmd = [str(CROP_IMG), str(pdf_file), str(TEMP_PATH)]
             logger.info(cmd)
             p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
             for line in iter(p.stdout.readline, b''):
