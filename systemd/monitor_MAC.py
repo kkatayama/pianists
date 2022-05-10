@@ -6,15 +6,11 @@ from watchdog.events import PatternMatchingEventHandler
 from watchdog.observers import Observer
 from log_handler import getLogger
 from configparser import ConfigParser
-from pathlib import Path
 import pandas as pd
 import requests
-import argparse
-import logging
 import shutil
 import json
 import time
-import sys
 import os
 
 
@@ -82,14 +78,21 @@ class MonitorChanges(PatternMatchingEventHandler):
             for index, note in df.iterrows():
                 logger.debug(f'{note["pitch_str"]} (duration: {note["duration"]})')
 
+
+
+            ###################################################################
+            #                          NEED TO EDIT                           #
+            ###################################################################
+
             # -- 4. parse drawings and do more machine learning ...?
 
             # -- 5. generate p-code ...
             logger.info(f'generating p-code ...')
+            PCODE_FILE = str(CSV_FILE).replace('.csv', '.pcode')
 
             # -- 6. send p-code to raspberry pi
-            logger.info(f'Sending p-code File: {CSV_FILE}')
-            cmd = f"rsync -v -e 'ssh -A -t -p {server['port']} {server['username']}@{server['ip']} ssh -A -t -p {udel['port']} {pi['username']}@{pi['ip']}' {str(pdf_file)} :{pi['remote_path']}/temp.pdf"
+            logger.info(f'Sending p-code File: {PCODE_FILE}')
+            cmd = f"rsync -v -e 'ssh -A -t -p {server['port']} {server['username']}@{server['ip']} ssh -A -t -p {pi['port']} {pi['username']}@{pi['ip']}' {PCODE_FILE} :{pi['remote_path']}/{PCODE_FILE.name}"
             logger.info(cmd)
             os.system(cmd)
             time.sleep(2)

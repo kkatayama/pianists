@@ -233,7 +233,7 @@ def installMacDaemon():
         "port": "2222",
         "username": USER,
         "remote_path": WATCH_PATH,
-        "temp_path", TEMP_PATH
+        "temp_path": TEMP_PATH
     }
     with open(str(CONF_INI), 'w') as f:
         config.write(f)
