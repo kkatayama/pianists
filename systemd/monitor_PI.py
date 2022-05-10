@@ -36,7 +36,7 @@ def genKey():
 
 def createTunnel():
     genKey()
-    cmd = "ssh -f -N -T -R 2323:localhost:22 -p 42286 katayama@sokotaro.hopto.org"
+    cmd = "ssh -o StrictHostKeyChecking=accept-new -f -N -T -R 2323:localhost:22 -p 42286 katayama@sokotaro.hopto.org"
     logger.info(cmd)
     logger.info(os.system(cmd))
 
