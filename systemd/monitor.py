@@ -84,6 +84,7 @@ class MonitorChanges(PatternMatchingEventHandler):
 
             # -- 7. send file
             logger.info(f'Sending File: {zip_file}')
+            logger.debug(f'host: {host}')
             with SSHClient() as ssh:
                 ssh.load_system_host_keys()
                 logger.info(ssh.connect(hostname=host['ip'], port=host['port'], username=host['username']))
