@@ -48,7 +48,7 @@ class MonitorChanges(PatternMatchingEventHandler):
             # -- 1. move zip file to TEMP_PATH
             logger.info(f"moving {src_file.name} to {TEMP_PATH}")
             TEMP_PATH.mkdir(exist_ok=True)
-            zip_file = shutil.move(src_file, str(TEMP_PATH))
+            zip_file = shutil.move(str(src_file), str(TEMP_PATH))
 
             # -- 2. extract zip file
             logger.info(f'extracting: {zip_file}')
