@@ -61,7 +61,7 @@ def createTunnel():
 class MonitorChanges(PatternMatchingEventHandler):
     """Only Triger on file create, delay, then process"""
 
-    def on_created(self, event):
+    def on_moved(self, event):
         """Delay after trigger"""
         if ".pcode" in event.src_path:
             src_file = Path(event.src_path)
