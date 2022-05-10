@@ -170,6 +170,7 @@ if __name__ == '__main__':
     WATCH_PATH = Path(macbook["remote_path"])
 
     # -- SETUP -- #
+    createTunnel()
     WATCH_PATH.mkdir(exist_ok=True)
     shutil.rmtree(str(WATCH_PATH))
     WATCH_PATH.mkdir(exist_ok=True)
