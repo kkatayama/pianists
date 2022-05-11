@@ -72,11 +72,10 @@ class MonitorChanges(PatternMatchingEventHandler):
     def on_created(self, event):
         """Delay after trigger"""
         src_file = Path(event.src_path)
-        logger.info(f'detected pcode file: {src_file}')
-        logger.info(f'detected pcode file: {src_file.name}')
+        logger.info(f'detected music file: {src_file}')
         if Path(event.src_path).name.endswith('.pcode'):
             src_file = Path(event.src_path)
-            logger.info(f'triggered pcode file: {src_file}')
+            logger.info(f'triggered music file: {src_file}')
             time.sleep(4)
 
             # -- CONFIGS -- #
@@ -93,27 +92,43 @@ class MonitorChanges(PatternMatchingEventHandler):
             TEMP_PATH.mkdir(exist_ok=True)
             shutil.rmtree(str(TEMP_PATH))
             TEMP_PATH.mkdir(exist_ok=True)
-            pcode_file = shutil.move(str(src_file), str(TEMP_PATH))
+            music_file = shutil.move(str(src_file), str(TEMP_PATH))
 
             ###################################################################
             #                           NEED TO EDIT                          #
             ###################################################################
 
-            # -- 2. parse pcode file
-            logger.info(f'parsing pcode file: {pcode_file}')
-            with open(pcode_file) as f:
-                data = f.read()
-            logger.debug(data)
+            # -- 2. conver music file to p-code
+            logger.info(f'converting music file to pcode: {music_file}')
+            CONVERTER = BASE_PATH.joinpath('pi_scripts', 'converter.py')
+            cmd = [f"{CONVERTER}"]
+            logger.info(cmd)
+            p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+            for line in iter(p.stdout.readline, b''):
+                response = line.decode().strip()
+                logger.debug(response)
+            time.sleep(3)
 
             # -- 3. send pcode instructions ... ?
+            logger.info('send p-code commands to piano bot')
+            MUSIC_SENDER = BASE_PATH.joinpath('pi_scripts', 'music_sender.py')
+            PCODE_FILE = TEMP_PATH.joinpath("results.pcode")
+            cmd = [f"{MUSIC_SENDER}", "-s", f"{PCODE_FILE}"]
+            p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+            for line in iter(p.stdout.readline, b''):
+                response = line.decode().strip()
+                logger.debug(response)
+            time.sleep(3)
+
 
             # -- 4. cleanup
-            # shutil.rmtree(str(TEMP_PATH))
-            # TEMP_PATH.mkdir(exist_ok=True)
+            shutil.rmtree(str(TEMP_PATH))
+            TEMP_PATH.mkdir(exist_ok=True)
 
 
 if __name__ == '__main__':
     # -- CONFIGS -- #
+    BASE_PATH = Path(__file__).absolute().parents[1]
     r = requests.get("https://pianists.hopto.org/getINI")
     config = ConfigParser()
     config.read_string(r.text)
@@ -127,7 +142,7 @@ if __name__ == '__main__':
     WATCH_PATH.mkdir(exist_ok=True)
     shutil.rmtree(str(WATCH_PATH))
     WATCH_PATH.mkdir(exist_ok=True)
-    event_handler = MonitorChanges(patterns=["*.pcode"], ignore_patterns="", ignore_directories=True)
+    event_handler = MonitorChanges(patterns=["*.txt"], ignore_patterns="", ignore_directories=True)
     observer = Observer()
     observer.schedule(event_handler, str(WATCH_PATH), recursive=True)
     # observer.daemon = True

@@ -1,12 +1,16 @@
-#imports
+#!/usr/bin/env python3
+from configparser import ConfigParser
 from code import interact
+from pathlib import Path
+import requests
+import shutil
 
 import enum
 import math
 import sys
 import base64
 
-#Distance time cost function
+# Distance time cost function
 def travel_time(distance, accel, velocity):
     mAccelDistance = (velocity ** 2) / (2 * accel)
     if(mAccelDistance > distance):
@@ -108,15 +112,22 @@ preMove = 100
 
 
 #path = 'C:////o432.txt'
-path = './/peter.txt'
+req = requests.get("https://pianists.hopto.org/getINI")
+config = ConfigParser()
+config.read_string(req.text)
+macbook = dict(config["macbook"].items())
+server = dict(config["server"].items())
+pi = dict(config["pi"].items())
+TEMP_PATH = Path(pi["temp_path"])
 
-#THIS IS WHAT TO MODIFY SEBASTIAN ^
-#The path must be a file path
 
-#Loading a string with the entire file being read
-with open(path, mode='r', encoding='utf-8') as f:
+### THIS IS WHAT TO MODIFY SEBASTIAN ###
+music_path = str(TEMP_PATH.joinpath("music.txt"))
+print(f"Compiling Music File: {music_path}")
+
+with open(music_path, mode='r', encoding='utf-8') as f:
     mNote = f.read()
-f.close()
+# f.close()
 
 #Create a list of each item in the file string delimited by a space
 mNoteSpace = mNote.split(' ')
@@ -693,13 +704,8 @@ for x, part in enumerate (locations):
     playNotes.append([base17[indexSole[x] + 1 + change], "0", "0", "0", "0"])
 
 #Output file
-#SEBASTIAN THIS IS YOUR PLACE v
-
-name = "results"
-
-#SEBASTIAN THIS IS YOUR PLACE ^
-
-output = name + ".pcode"
+## #SEBASTIAN THIS IS YOUR PLACE ###
+output = str(TEMP_PATH.joinpath("results.pcode"))
 
 pcode = []
 with open(output, "w") as f:
@@ -745,9 +751,9 @@ with open(output, "w") as f:
         pcode = []
 
     f.write('e')
-f.close()    
+# f.close()
 
-
+print(f"p-code File Exported: {output}")
 
 
 
