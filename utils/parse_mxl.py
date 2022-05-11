@@ -19,7 +19,7 @@ if __name__ == '__main__':
         BASE_PATH = Path(args.base_path)
 
     # data = music.to_ordered_dict()
-    music = muspy.read_musicxml(str(MXL_FILE), resolution=1)
+    music = muspy.read_musicxml(str(MXL_FILE), resolution=4)
     data = json.loads(json.dumps(music.to_ordered_dict()))
 
     # -- split notes by treble and bass clef
