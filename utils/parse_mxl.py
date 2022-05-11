@@ -31,7 +31,7 @@ if __name__ == '__main__':
     qpm = data["tempos"][0]["qpm"] if data.get("tempos") else 100
     num = data["time_signatures"][0]["numerator"] if data.get("time_signatures") else 4
     den = data["time_signatures"][0]["denominator"] if data.get("time_signatures") else 4
-    p_code_treble = ["R", f"{qpm}", f"{num}/{den}"]
+    p_code_treble = ["R", f"{int(qpm)}", f"{num}/{den}"]
 
     # -- format each note -- #
     for note in treble:
