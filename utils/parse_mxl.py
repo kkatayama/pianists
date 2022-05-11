@@ -44,11 +44,12 @@ if __name__ == '__main__':
     # -- export p-code --#
     with open("music.pcode", "w") as f:
         f.write(" ".join(p_code_treble) + " ")
+    print(p_code_treble)
 
     # df = pd.DataFrame([dict(i) for i in data["tracks"][0]["notes"]])
     # df.to_csv(f'{BASE_PATH.joinpath(MXL_FILE.stem)}.csv', index=False)
+    # print(df)
 
     with open(f'{BASE_PATH.joinpath(MXL_FILE.stem)}.json', 'w') as f:
         music.save_json(f)
 
-    print(df)
