@@ -43,7 +43,7 @@ if __name__ == '__main__':
 
     # -- export p-code --#
     with open("music.txt", "w") as f:
-        f.write(" ".join(p_code_treble) + " ")
+        f.write(" ".join(p_code_treble) + "\n")
     print(p_code_treble)
 
     # df = pd.DataFrame([dict(i) for i in data["tracks"][0]["notes"]])
