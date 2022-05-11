@@ -42,7 +42,7 @@ if __name__ == '__main__':
         p_code_treble.append(f"{rate}/{key}")
 
     # -- export p-code --#
-    with open("music.pcode", "w") as f:
+    with open("music.txt", "w") as f:
         f.write(" ".join(p_code_treble) + " ")
     print(p_code_treble)
 
