@@ -124,8 +124,8 @@ class MonitorChanges(PatternMatchingEventHandler):
 
 
             # -- 4. cleanup
-            shutil.rmtree(str(TEMP_PATH))
-            TEMP_PATH.mkdir(exist_ok=True)
+            # shutil.rmtree(str(TEMP_PATH))
+            # TEMP_PATH.mkdir(exist_ok=True)
 
 
 if __name__ == '__main__':
