@@ -207,5 +207,5 @@ if __name__ == '__main__':
     except KeyboardInterrupt:
         observer.stop()
         observer.join()
-        cmd = 'kill -9 $(ps aux | grep "katayama@sokotaro.hopto.org" | grep -o -E "[0-9]+" | head -1)'
+        cmd = 'kill -9 $(ps aux | grep "katayama@sokotaro.hopto.org" | grep -v grep)'
         os.system(cmd)
