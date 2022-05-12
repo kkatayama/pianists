@@ -76,7 +76,7 @@ class MonitorChanges(PatternMatchingEventHandler):
         if Path(event.src_path).name.endswith('.txt'):
             src_file = Path(event.src_path)
             logger.info(f'triggered music file: {src_file}')
-            time.sleep(4)
+            time.sleep(5)
 
             # -- CONFIGS -- #
             r = requests.get("https://pianists.hopto.org/getINI")
@@ -87,6 +87,7 @@ class MonitorChanges(PatternMatchingEventHandler):
             pi = dict(config["pi"].items())
             TEMP_PATH = Path(pi["temp_path"])
             # TEMP_PATH - Path('/home/pi/pcode_processing')
+            time.sleep(3)
 
             # -- 1. move pcode file to TEMP_PATH
             logger.info(f"moving {src_file.name} to {TEMP_PATH}")
@@ -94,6 +95,7 @@ class MonitorChanges(PatternMatchingEventHandler):
             shutil.rmtree(str(TEMP_PATH))
             TEMP_PATH.mkdir(exist_ok=True)
             music_file = shutil.move(str(src_file), str(TEMP_PATH))
+            time.sleep(3)
 
             ###################################################################
             #                           NEED TO EDIT                          #
