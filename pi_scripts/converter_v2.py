@@ -1,14 +1,8 @@
 #!/usr/bin/env python3
-import argparse
-# from code import interact
 from pathlib import Path
-import requests
-import shutil
-
-import enum
+import argparse
 import math
 import sys
-import base64
 
 # Distance time cost function
 def travel_time(distance, accel, velocity):
@@ -21,11 +15,8 @@ def travel_time(distance, accel, velocity):
         rDistance = distance - accelDistance
 
     accelTime = 2 * math.sqrt(accelDistance / (accel))
-
     linearTime = rDistance / velocity
-
     totalTime = accelTime + linearTime
-
     return totalTime * 1000
 
 #List to convert decimal to base 17
@@ -84,12 +75,10 @@ G7 = [None, None, None, None, 44, 43, 42, 41]
 A7 = [None, None, None, None, None, 44, 43, 42]
 B7 = [None, None, None, None, None, None, 44, 43]
 C8 = [None, None, None, None, None, None, None, 44]
-R = list(range(1,44))
+R = list(range(1, 44))
 
 #List of all the notes with there respective list
 notes = [A0, B0, C1, D1, E1, F1, G1, A1, B1, C2, D2, E2, F2, G2, A2, B2, C3, D3, E3, F3, G3, A3, B3, C4, D4, E4, F4, G4, A4, B4, C5, D5, E5, F5, G5, A5, B5, C6, D6, E6, F6, G6, A6, B6, C7, D7, E7, F7, G7, A7, B7, C8, R]
-
-
 
 #Parallel list which has the notes name as a string
 positions = ['A0', 'B0', 'C1', 'D1', 'E1', 'F1', 'G1', 'A1', 'B1', 'C2', 'D2', 'E2', 'F2', 'G2', 'A2', 'B2', 'C3', 'D3', 'E3', 'F3', 'G3', 'A3', 'B3', 'C4', 'D4', 'E4', 'F4', 'G4', 'A4', 'B4', 'C5', 'D5', 'E5', 'F5', 'G5', 'A5', 'B5', 'C6', 'D6', 'E6', 'F6', 'G6', 'A6', 'B6', 'C7', 'D7', 'E7', 'F7', 'G7', 'A7', 'B7', 'C8', 'R']
@@ -760,3 +749,11 @@ print(playSet[-1*(x+1)])
 """
 
 
+if __name__ == '__main__':
+    ap = argparse.ArgumentParser()
+    ap.add_argument('-i', '--input', required=True, help='input file: music.txt')
+    ap.add_argument('-o', '--output', required=True, help='output file: results.pcode')
+    args = ap.parse_args()
+
+    music_path = Path(args.i)
+    results_path = Path(args.o)
