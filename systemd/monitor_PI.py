@@ -79,13 +79,14 @@ class MonitorChanges(PatternMatchingEventHandler):
             time.sleep(4)
 
             # -- CONFIGS -- #
-            r = requests.get("https://pianists.hopto.org/getINI")
-            config = ConfigParser()
-            config.read_string(r.text)
-            macbook = dict(config["macbook"].items())
-            server = dict(config["server"].items())
-            pi = dict(config["pi"].items())
-            TEMP_PATH = Path(pi["temp_path"])
+            # r = requests.get("https://pianists.hopto.org/getINI")
+            # config = ConfigParser()
+            # config.read_string(r.text)
+            # macbook = dict(config["macbook"].items())
+            # server = dict(config["server"].items())
+            # pi = dict(config["pi"].items())
+            # TEMP_PATH = Path(pi["temp_path"])
+            TEMP_PATH - Path('/home/pi/pcode_processing')
 
             # -- 1. move pcode file to TEMP_PATH
             logger.info(f"moving {src_file.name} to {TEMP_PATH}")
