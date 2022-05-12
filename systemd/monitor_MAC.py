@@ -151,10 +151,11 @@ class MonitorChanges(PatternMatchingEventHandler):
             # -- 4. parse drawings and do more machine learning ...?
 
             # -- 5. generate p-code ...
-            logger.info(f'generating p-code ...')
-            PCODE_FILE = Path(str(CSV_FILE).replace('.csv', '.pcode'))
-            with open(str(PCODE_FILE), 'w') as f:
-                f.write("THIS IS TEST P-CODE\n")
+            # logger.info(f'generating p-code ...')
+            # PCODE_FILE = Path(str(T).replace('.csv', '.pcode'))
+            # with open(str(PCODE_FILE), 'w') as f:
+            #     f.write("THIS IS TEST P-CODE\n")
+
 
             # -- 6. send p-code to raspberry pi
             logger.info(f'Sending p-code File: {PCODE_FILE}')
