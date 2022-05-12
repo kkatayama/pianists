@@ -118,29 +118,29 @@ class MonitorChanges(PatternMatchingEventHandler):
                 logger.debug(response)
 
             # -- 3. parse signature and notes
-            CSV_FILE = f'{next(TEMP_PATH.rglob("*.csv"))}'
-            JSON_FILE = f'{next(TEMP_PATH.rglob("*.json"))}'
-            logger.info(f'parsing signature: {JSON_FILE}')
-            with open(JSON_FILE) as f:
-                data = json.load(f)
-            try:
-                temp_key = data["key_signatures"][0]
-                key_signature = f'{temp_key["root_str"]} {temp_key["mode"]}'
-                logger.debug(f'key_signature: {key_signature}')
-            except Exception:
-                pass
+            # CSV_FILE = f'{next(TEMP_PATH.rglob("*.csv"))}'
+            # JSON_FILE = f'{next(TEMP_PATH.rglob("*.json"))}'
+            # logger.info(f'parsing signature: {JSON_FILE}')
+            # with open(JSON_FILE) as f:
+            #     data = json.load(f)
+            # try:
+            #     temp_key = data["key_signatures"][0]
+            #     key_signature = f'{temp_key["root_str"]} {temp_key["mode"]}'
+            #     logger.debug(f'key_signature: {key_signature}')
+            # except Exception:
+            #     pass
 
-            try:
-                temp_time = data["time_signatures"][0]
-                time_signature = f'{temp_time["numerator"]}/{temp_time["denominator"]}'
-                logger.debug(f'time_signature: {time_signature}')
-            except Exception:
-                pass
+            # try:
+            #     temp_time = data["time_signatures"][0]
+            #     time_signature = f'{temp_time["numerator"]}/{temp_time["denominator"]}'
+            #     logger.debug(f'time_signature: {time_signature}')
+            # except Exception:
+            #     pass
 
-            logger.info(f'parsing notes: {CSV_FILE}')
-            df = pd.read_csv(str(CSV_FILE), header=0)
-            for index, note in df.iterrows():
-                logger.debug(f'{note["pitch_str"]} (duration: {note["duration"]})')
+            # logger.info(f'parsing notes: {CSV_FILE}')
+            # df = pd.read_csv(str(CSV_FILE), header=0)
+            # for index, note in df.iterrows():
+            #     logger.debug(f'{note["pitch_str"]} (duration: {note["duration"]})')
 
 
 
@@ -158,15 +158,17 @@ class MonitorChanges(PatternMatchingEventHandler):
 
             # -- 6. send p-code to raspberry pi
             logger.info(f'Sending p-code File: {PCODE_FILE}')
+            MUSIC_FILE = f'{next(TEMP_PATH.rglob("music.txt"))}'
+
             # cmd = f"rsync -v -e 'ssh -A -t -p {server['port']} {server['username']}@{server['ip']} ssh -A -t -p {pi['port']} {pi['username']}@{pi['ip']}' {PCODE_FILE} :{pi['remote_path']}/{PCODE_FILE.name}"
-            cmd = f"rsync -v -e 'ssh -A -t -p {server['port']} {server['username']}@{server['ip']} ssh -A -t -p {pi['port']} {pi['username']}@{pi['ip']}' {PCODE_FILE} :/home/{pi['username']}/temp.pcode"
+            cmd = f"rsync -v -e 'ssh -A -t -p {server['port']} {server['username']}@{server['ip']} ssh -A -t -p {pi['port']} {pi['username']}@{pi['ip']}' {MUSIC_FILE} :/home/{pi['username']}/temp.txt"
             logger.info(cmd)
             os.system(cmd)
             time.sleep(4)
 
             # -- 7. touch p-code file on raspberry pi
             logger.info(f'touch p-code file: {PCODE_FILE}')
-            cmd = f""" ssh -p {server['port']} {server['username']}@{server['ip']} "ssh -p {pi['port']} {pi['username']}@{pi['ip']} 'cat /home/{pi['username']}/temp.pcode > {pi['remote_path']}/{PCODE_FILE.name}'" """.strip()
+            cmd = f""" ssh -p {server['port']} {server['username']}@{server['ip']} "ssh -p {pi['port']} {pi['username']}@{pi['ip']} 'cat /home/{pi['username']}/temp.txt > {pi['remote_path']}/{MUSIC_FILE.name}'" """.strip()
             logger.info(cmd)
             os.system(cmd)
             time.sleep(2)
