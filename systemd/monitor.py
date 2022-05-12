@@ -74,13 +74,13 @@ class MonitorChanges(PatternMatchingEventHandler):
 
             # -- 4. crop image drawings
             # os.chdir(f"{TEMP_PATH}")
-            CROP_IMG = BASE_PATH.joinpath("utils", "extract_pdf_drawings.py")
-            cmd = [str(CROP_IMG), str(pdf_file), str(TEMP_PATH)]
-            logger.info(cmd)
-            p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-            for line in iter(p.stdout.readline, b''):
-                response = line.decode().strip()
-                logger.debug(response)
+            # CROP_IMG = BASE_PATH.joinpath("utils", "extract_pdf_drawings.py")
+            # cmd = [str(CROP_IMG), str(pdf_file), str(TEMP_PATH)]
+            # logger.info(cmd)
+            # p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+            # for line in iter(p.stdout.readline, b''):
+            #     response = line.decode().strip()
+            #     logger.debug(response)
 
             # -- 5. compress files to a .zip archive
             # os.chdir(f'{TEMP_PATH.parent}')
