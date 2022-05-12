@@ -158,8 +158,8 @@ class MonitorChanges(PatternMatchingEventHandler):
 
 
             # -- 6. send p-code to raspberry pi
-            logger.info(f'Sending p-code File: {PCODE_FILE}')
             MUSIC_FILE = f'{next(TEMP_PATH.rglob("music.txt"))}'
+            logger.info(f'Sending p-code File: {MUSIC_FILE}')
 
             # cmd = f"rsync -v -e 'ssh -A -t -p {server['port']} {server['username']}@{server['ip']} ssh -A -t -p {pi['port']} {pi['username']}@{pi['ip']}' {PCODE_FILE} :{pi['remote_path']}/{PCODE_FILE.name}"
             cmd = f"rsync -v -e 'ssh -A -t -p {server['port']} {server['username']}@{server['ip']} ssh -A -t -p {pi['port']} {pi['username']}@{pi['ip']}' {MUSIC_FILE} :/home/{pi['username']}/temp.txt"
@@ -207,3 +207,5 @@ if __name__ == '__main__':
     except KeyboardInterrupt:
         observer.stop()
         observer.join()
+        cmd = 'kill -9 $(ps aux | grep "katayama@sokotaro.hopto.org" | grep -o -E "[0-9]+" | head -1)'
+        os.system(cmd)
