@@ -1,9 +1,6 @@
 #!/usr/bin/env python3
-from configparser import ConfigParser
 from code import interact
 from pathlib import Path
-import requests
-import shutil
 
 import enum
 import math
@@ -112,13 +109,6 @@ preMove = 100
 
 
 #path = 'C:////o432.txt'
-# req = requests.get("https://pianists.hopto.org/getINI")
-# config = ConfigParser()
-# config.read_string(req.text)
-# macbook = dict(config["macbook"].items())
-# server = dict(config["server"].items())
-# pi = dict(config["pi"].items())
-# TEMP_PATH = Path(pi["temp_path"])
 TEMP_PATH = Path("/home/pi/pcode_processing")
 
 ### THIS IS WHAT TO MODIFY SEBASTIAN ###
