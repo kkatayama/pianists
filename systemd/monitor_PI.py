@@ -78,7 +78,7 @@ class MonitorChanges(PatternMatchingEventHandler):
             logger.info(f'triggered music file: {src_file}')
             time.sleep(4)
 
-            -- CONFIGS -- #
+            # -- CONFIGS -- #
             r = requests.get("https://pianists.hopto.org/getINI")
             config = ConfigParser()
             config.read_string(r.text)
