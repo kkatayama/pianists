@@ -114,7 +114,7 @@ class MonitorChanges(PatternMatchingEventHandler):
             logger.info('send p-code commands to piano bot')
             MUSIC_SENDER = BASE_PATH.joinpath('pi_scripts', 'music_sender.py')
             PCODE_FILE = TEMP_PATH.joinpath("results.pcode")
-            cmd = [f"{MUSIC_SENDER}", "--src", f"{PCODE_FILE}"]
+            cmd = ["/usr/bin/python3.9", f"{MUSIC_SENDER}", "--src", f"{PCODE_FILE}"]
             logger.info(cmd)
             p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
             for line in iter(p.stdout.readline, b''):
