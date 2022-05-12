@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 from configparser import ConfigParser
-from code import interact
+# from code import interact
 from pathlib import Path
 import requests
 import shutil
@@ -19,7 +19,7 @@ def travel_time(distance, accel, velocity):
     else:
         accelDistance = mAccelDistance
         rDistance = distance - accelDistance
-        
+
     accelTime = 2 * math.sqrt(accelDistance / (accel))
 
     linearTime = rDistance / velocity
