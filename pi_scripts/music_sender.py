@@ -3,26 +3,31 @@ import serial
 import time
 import threading
 import sys
+import argparse
 
 
-ser  = serial.Serial('/dev/ttyACM0', 9600, timeout=1)
+if __name__ == '__main__':
+    ap = argparse.ArgumentParser()
+    ap.add_argument("-s", "--src", help="the musicmxl file to parse")
+    args = ap.parse_args()
 
-if sys.argv[1] == 't':
-    ser.write('p\n'.encode('ascii'))
+    ser  = serial.Serial('/dev/ttyACM0', 9600, timeout=1)
 
-if sys.argv[1] == '-c':
+    """
+    if sys.argv[1] == 't':
+        ser.write('p\n'.encode('ascii'))
 
-    code = ' '.join(sys.argv[2:]) + '\n'
+    if sys.argv[1] == '-c':
 
-    ser.write(code.encode('utf-8'))
+        code = ' '.join(sys.argv[2:]) + '\n'
 
-if sys.argv[1] == '-s':
+        ser.write(code.encode('utf-8'))
+    """
 
-    path = sys.argv[2]
+    if args.src:
+        path = args.src
 
-    with open(path, mode='r', encoding='utf-8') as f:
-        stuff = f.read()
+        with open(path, mode='r', encoding='utf-8') as f:
+            stuff = f.read()
 
-    ser.write(stuff.encode('utf-8'))
-
-
+        ser.write(stuff.encode('utf-8'))
