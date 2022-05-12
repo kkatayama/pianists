@@ -168,7 +168,7 @@ class MonitorChanges(PatternMatchingEventHandler):
             time.sleep(4)
 
             # -- 7. touch p-code file on raspberry pi
-            logger.info(f'touch p-code file: {PCODE_FILE}')
+            logger.info(f'touch p-code file: {MUSIC_FILE}')
             cmd = f""" ssh -p {server['port']} {server['username']}@{server['ip']} "ssh -p {pi['port']} {pi['username']}@{pi['ip']} 'cat /home/{pi['username']}/temp.txt > {pi['remote_path']}/{MUSIC_FILE.name}'" """.strip()
             logger.info(cmd)
             os.system(cmd)
@@ -207,5 +207,5 @@ if __name__ == '__main__':
     except KeyboardInterrupt:
         observer.stop()
         observer.join()
-        cmd = 'kill -9 $(ps aux | grep "katayama@sokotaro.hopto.org" | grep -v grep)'
+        cmd = 'kill -9 $(ps aux | grep "katayama@sokotaro.hopto.org" | grep -v grep | awk "{print $2}")'
         os.system(cmd)
