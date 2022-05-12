@@ -169,7 +169,7 @@ class MonitorChanges(PatternMatchingEventHandler):
 
             # -- 7. touch p-code file on raspberry pi
             logger.info(f'touch p-code file: {MUSIC_FILE}')
-            cmd = f""" ssh -p {server['port']} {server['username']}@{server['ip']} "ssh -p {pi['port']} {pi['username']}@{pi['ip']} 'cat /home/{pi['username']}/temp.txt > {pi['remote_path']}/{MUSIC_FILE.name}'" """.strip()
+            cmd = f""" ssh -p {server['port']} {server['username']}@{server['ip']} "ssh -p {pi['port']} {pi['username']}@{pi['ip']} 'cat /home/{pi['username']}/temp.txt > {pi['remote_path']}/{MUSIC_FILE}'" """.strip()
             logger.info(cmd)
             os.system(cmd)
             time.sleep(2)
