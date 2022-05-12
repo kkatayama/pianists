@@ -18,7 +18,7 @@ if sys.argv[1] == '-c':
 
 if sys.argv[1] == '-s':
 
-    path = '//home//pi//' + sys.argv[2]
+    path = sys.argv[2]
 
     with open(path, mode='r', encoding='utf-8') as f:
         stuff = f.read()
