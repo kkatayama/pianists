@@ -1,0 +1,55 @@
+127.0.0.1 2022-05-20 02:26:54.203363 GET http://127.0.0.1:8380/ 200 OK
+{"request.params": {"webapp": true}}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Pianists</title>
+    <link rel="stylesheet" type="text/css" href="/static/css/blueTableIndex.css">
+  </head>
+
+  <body>
+    <div class="center">
+      <form action="/login" method="post">
+        <div class="divTable blueTable">
+          <div class="divTableBody">
+            <div class="divTableRow">
+              <div class="divTableCell">
+                <input name="username" type="text" placeholder="Username" />
+              </div>
+            </div>
+            <div class="divTableRow">
+              <div class="divTableCell">
+                <input name="password" type="password" placeholder="Password" />
+              </div>
+            </div>
+          </div>
+          <div class="divTableFoot tableFootStyle">
+            <div class="divTableRow">
+              <div class="divTableCell">
+                <div class="divTableCellLeft"><input type="submit" name="webapp" value="Login" /></div>
+                <div class="divTableCellRight"><a href="/register">Register</a></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
+  </body>
+</html>
+
+{
+  "message": "Not found: '/robots.txt'",
+  "Server Error": {
+    "exception": null,
+    "traceback": null,
+    "_cookies": null,
+    "_headers": {
+      "Content-Type": [
+        "application/json"
+      ]
+    },
+    "body": "Not found: '/robots.txt'",
+    "_status_code": 404,
+    "_status_line": "404 Not Found"
+  }
+}

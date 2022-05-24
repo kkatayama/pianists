@@ -1,0 +1,10 @@
+127.0.0.1 2022-05-17 11:18:35.099067 GET http://127.0.0.1:8380/ 200 OK
+{
+  "request.params": {
+    "webapp": false
+  }
+}
+{
+  "message": "index/login",
+  "request": "http://127.0.0.1:8380/"
+}
