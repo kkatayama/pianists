@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>Label</key>
+	<string>com.pianists.watchdog</string>
+	<key>ProcessType</key>
+	<string>LowPriorityBackgroundIO</string>
+	<key>ProgramArguments</key>
+	<array>
+		<string>/Users/katayama/.pyenv/versions/3.9.1/bin/python3</string>
+		<string>/Users/katayama/Documents/School/Senior_Design/CAPSTONE_2021/PIANIST/pianists/systemd/monitor_MAC.py</string>
+		<string>/Users/katayama/incoming</string>
+	</array>
+	<key>RunAtLoad</key>
+	<true/>
+	<key>WorkingDirector</key>
+	<string>/Users/katayama/ml_processing</string>
+</dict>
+</plist>
