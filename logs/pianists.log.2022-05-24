@@ -1,0 +1,684 @@
+{
+  "query": "SELECT * FROM users WHERE username=?;"
+}
+{
+  "values": [
+    "udelpianist"
+  ]
+}
+127.0.0.1 2022-05-24 12:44:26.180543 POST http://127.0.0.1:8380/login 200 OK
+{
+  "request.params": {
+    "username": "udelpianist",
+    "password": "Ydelpianist",
+    "webapp": false
+  }
+}
+{
+  "message": "incorrect password",
+  "password": "Ydelpianist"
+}
+{
+  "query": "SELECT * FROM users WHERE username=?;"
+}
+{
+  "values": [
+    "udelpianist"
+  ]
+}
+127.0.0.1 2022-05-24 12:44:36.678446 POST http://127.0.0.1:8380/login 200 OK
+{
+  "request.params": {
+    "username": "udelpianist",
+    "password": "Udelpianist",
+    "webapp": false
+  }
+}
+{
+  "message": "user login success",
+  "user_id": 11,
+  "username": "udelpianist",
+  "token": "IUVEN3ZKUk1yZmdwUmMrSUNXelhUQmc9PT9nQVdWRWdBQUFBQUFBQUNNQjNWelpYSmZhV1NVakFJeE1aU0dsQzQ9"
+}
+cookie_info = ('user_id', '11')
+{
+  "query": "SELECT * FROM files WHERE user_id=?;"
+}
+{
+  "values": [
+    "11"
+  ]
+}
+127.0.0.1 2022-05-24 12:44:36.747849 GET http://127.0.0.1:8380/dashboard?token=IUVEN3ZKUk1yZmdwUmMrSUNXelhUQmc9PT9nQVdWRWdBQUFBQUFBQUNNQjNWelpYSmZhV1NVakFJeE1aU0dsQzQ9 200 OK
+{
+  "request.params": {
+    "token": "IUVEN3ZKUk1yZmdwUmMrSUNXelhUQmc9PT9nQVdWRWdBQUFBQUFBQUNNQjNWelpYSmZhV1NVakFJeE1aU0dsQzQ9",
+    "webapp": false
+  }
+}
+{
+  "message": "user_dashboard",
+  "files": [
+    {
+      "entry_id": 22,
+      "user_id": 11,
+      "title": "F\u00fcr Elise",
+      "level": "Level 3",
+      "category": "Beethoven",
+      "file_name": "fur_elise_piano.pdf",
+      "entry_time": "2022-05-11 14:03:33.584639"
+    },
+    {
+      "entry_id": 24,
+      "user_id": 11,
+      "title": "Pathetique Sonata",
+      "level": "Level 5",
+      "category": "Beethoven",
+      "file_name": "pathetique-sonata-piano.pdf",
+      "entry_time": "2022-05-11 14:25:23.491977"
+    },
+    {
+      "entry_id": 25,
+      "user_id": 11,
+      "title": "Good King Wenceslas",
+      "level": "Level 1",
+      "category": "Christmas",
+      "file_name": "good-king-wenceslas-piano-solo.pdf",
+      "entry_time": "2022-05-11 16:11:46.802140"
+    },
+    {
+      "entry_id": 28,
+      "user_id": 11,
+      "title": "Brother John",
+      "level": "Level 1",
+      "category": "Nursery Rhyme",
+      "file_name": "brother-john-piano.pdf",
+      "entry_time": "2022-05-12 07:43:17.249671"
+    }
+  ]
+}
+cookie_info = ('user_id', '11')
+{
+  "query": "SELECT * FROM files WHERE user_id=?;"
+}
+{
+  "values": [
+    "11"
+  ]
+}
+127.0.0.1 2022-05-24 12:44:38.871410 GET http://127.0.0.1:8380/dashboard?token=IUVEN3ZKUk1yZmdwUmMrSUNXelhUQmc9PT9nQVdWRWdBQUFBQUFBQUNNQjNWelpYSmZhV1NVakFJeE1aU0dsQzQ9 200 OK
+{
+  "request.params": {
+    "token": "IUVEN3ZKUk1yZmdwUmMrSUNXelhUQmc9PT9nQVdWRWdBQUFBQUFBQUNNQjNWelpYSmZhV1NVakFJeE1aU0dsQzQ9",
+    "webapp": false
+  }
+}
+{
+  "message": "user_dashboard",
+  "files": [
+    {
+      "entry_id": 22,
+      "user_id": 11,
+      "title": "F\u00fcr Elise",
+      "level": "Level 3",
+      "category": "Beethoven",
+      "file_name": "fur_elise_piano.pdf",
+      "entry_time": "2022-05-11 14:03:33.584639"
+    },
+    {
+      "entry_id": 24,
+      "user_id": 11,
+      "title": "Pathetique Sonata",
+      "level": "Level 5",
+      "category": "Beethoven",
+      "file_name": "pathetique-sonata-piano.pdf",
+      "entry_time": "2022-05-11 14:25:23.491977"
+    },
+    {
+      "entry_id": 25,
+      "user_id": 11,
+      "title": "Good King Wenceslas",
+      "level": "Level 1",
+      "category": "Christmas",
+      "file_name": "good-king-wenceslas-piano-solo.pdf",
+      "entry_time": "2022-05-11 16:11:46.802140"
+    },
+    {
+      "entry_id": 28,
+      "user_id": 11,
+      "title": "Brother John",
+      "level": "Level 1",
+      "category": "Nursery Rhyme",
+      "file_name": "brother-john-piano.pdf",
+      "entry_time": "2022-05-12 07:43:17.249671"
+    }
+  ]
+}
+cookie_info = ('user_id', '11')
+{
+  "query": "SELECT * FROM mmf WHERE (category = ? OR category = ?);"
+}
+{
+  "values": [
+    "Christmas",
+    "Beethoven"
+  ]
+}
+127.0.0.1 2022-05-24 12:44:53.371909 GET http://127.0.0.1:8380/search?token=IUVEN3ZKUk1yZmdwUmMrSUNXelhUQmc9PT9nQVdWRWdBQUFBQUFBQUNNQjNWelpYSmZhV1NVakFJeE1aU0dsQzQ9&title=&category6=Christmas&category1=Beethoven 200 OK
+{
+  "request.params": {
+    "token": "IUVEN3ZKUk1yZmdwUmMrSUNXelhUQmc9PT9nQVdWRWdBQUFBQUFBQUNNQjNWelpYSmZhV1NVakFJeE1aU0dsQzQ9",
+    "title": "",
+    "category6": "Christmas",
+    "category1": "Beethoven",
+    "webapp": false
+  }
+}
+{
+  "message": "search results",
+  "files": [
+    {
+      "entry_id": 1,
+      "title": "F\u00fcr Elise",
+      "url": "https://makingmusicfun.net/htm/f_printit_free_printable_sheet_music/fur-elise.php",
+      "category": "Beethoven",
+      "level": "Level 3",
+      "pdf_file": "pdf_files/Level_3/fur_elise_piano.pdf",
+      "pdf_url": "https://makingmusicfun.net/pdf/sheet_music/fur_elise_piano.pdf",
+      "entry_time": "2022-04-14 16:07:04.000"
+    },
+    {
+      "entry_id": 2,
+      "title": "Carol of the Bells",
+      "url": "https://makingmusicfun.net/htm/f_printit_free_printable_sheet_music/carol-of-the-bells-beginner-piano.php",
+      "category": "Christmas",
+      "level": "Level 1",
+      "pdf_file": "pdf_files/Level_1/carol-of-the-bells-beginner-piano.pdf",
+      "pdf_url": "https://makingmusicfun.net/pdf/sheet_music/carol-of-the-bells-beginner-piano.pdf",
+      "entry_time": "2022-04-14 16:07:04.000"
+    },
+    {
+      "entry_id": 4,
+      "title": "O Come, O Come Emmanuel",
+      "url": "https://makingmusicfun.net/htm/f_printit_free_printable_sheet_music/o-come-emmanuel-piano.php",
+      "category": "Christmas",
+      "level": "Level 2",
+      "pdf_file": "pdf_files/Level_2/o-come-emmanuel-piano.pdf",
+      "pdf_url": "https://makingmusicfun.net/pdf/sheet_music/o-come-emmanuel-piano.pdf",
+      "entry_time": "2022-04-14 16:07:04.000"
+    },
+    {
+      "entry_id": 11,
+      "title": "Go, Tell It On The Mountain",
+      "url": "https://makingmusicfun.net/htm/f_printit_free_printable_sheet_music/go-tell-it-on-the-mountain-beginner-piano.php",
+      "category": "Christmas",
+      "level": "Level 1",
+      "pdf_file": "pdf_files/Level_1/go-tell-it-on-the-mountain-beginner-piano.pdf",
+      "pdf_url": "https://makingmusicfun.net/pdf/sheet_music/go-tell-it-on-the-mountain-beginner-piano.pdf",
+      "entry_time": "2022-04-14 16:07:04.000"
+    },
+    {
+      "entry_id": 13,
+      "title": "Good King Wenceslas",
+      "url": "https://makingmusicfun.net/htm/f_printit_free_printable_sheet_music/good-king-wenceslas-piano-solo.php",
+      "category": "Christmas",
+      "level": "Level 1",
+      "pdf_file": "pdf_files/Level_1/good-king-wenceslas-piano-solo.pdf",
+      "pdf_url": "https://makingmusicfun.net/pdf/sheet_music/good-king-wenceslas-piano-solo.pdf",
+      "entry_time": "2022-04-14 16:07:04.000"
+    },
+    {
+      "entry_id": 15,
+      "title": "O Christmas Tree",
+      "url": "https://makingmusicfun.net/htm/f_printit_free_printable_sheet_music/o-christmas-tree-piano-solo.php",
+      "category": "Christmas",
+      "level": "Level 4",
+      "pdf_file": "pdf_files/Level_4/o-christmas-tree-piano-solo.pdf",
+      "pdf_url": "https://makingmusicfun.net/pdf/sheet_music/o-christmas-tree-piano-solo.pdf",
+      "entry_time": "2022-04-14 16:07:04.000"
+    },
+    {
+      "entry_id": 23,
+      "title": "Up on the Housetop",
+      "url": "https://makingmusicfun.net/htm/f_printit_free_printable_sheet_music/up-on-the-housetop-piano-solo.php",
+      "category": "Christmas",
+      "level": "Level 1",
+      "pdf_file": "pdf_files/Level_1/up-on-the-housetop-piano-solo.pdf",
+      "pdf_url": "https://makingmusicfun.net/pdf/sheet_music/up-on-the-housetop-piano-solo.pdf",
+      "entry_time": "2022-04-14 16:07:04.000"
+    },
+    {
+      "entry_id": 24,
+      "title": "Deck the Halls",
+      "url": "https://makingmusicfun.net/htm/f_printit_free_printable_sheet_music/deck-the-halls-piano-solo.php",
+      "category": "Christmas",
+      "level": "Level 4",
+      "pdf_file": "pdf_files/Level_4/deck-the-halls-piano-solo.pdf",
+      "pdf_url": "https://makingmusicfun.net/pdf/sheet_music/deck-the-halls-piano-solo.pdf",
+      "entry_time": "2022-04-14 16:07:04.000"
+    },
+    {
+      "entry_id": 26,
+      "title": "We Three Kings",
+      "url": "https://makingmusicfun.net/htm/f_printit_free_printable_sheet_music/we-three-kings-piano-solo.php",
+      "category": "Christmas",
+      "level": "Level 1",
+      "pdf_file": "pdf_files/Level_1/we-three-kings-piano-solo.pdf",
+      "pdf_url": "https://makingmusicfun.net/pdf/sheet_music/we-three-kings-piano-solo.pdf",
+      "entry_time": "2022-04-14 16:07:04.000"
+    },
+    {
+      "entry_id": 29,
+      "title": "O Little Town of Bethlehem",
+      "url": "https://makingmusicfun.net/htm/f_printit_free_printable_sheet_music/o-little-town-of-bethlehem-piano.php",
+      "category": "Christmas",
+      "level": "Level 5",
+      "pdf_file": "pdf_files/Level_5/o-little-town-of-bethlehem-piano.pdf",
+      "pdf_url": "https://makingmusicfun.net/pdf/sheet_music/o-little-town-of-bethlehem-piano.pdf",
+      "entry_time": "2022-04-14 16:07:04.000"
+    },
+    {
+      "entry_id": 30,
+      "title": "Hark! The Herald Angels Sing (Mendelssohn)",
+      "url": "https://makingmusicfun.net/htm/f_printit_free_printable_sheet_music/hark-the-herald-angels-sing-piano.php",
+      "category": "Christmas",
+      "level": "Level 3",
+      "pdf_file": "pdf_files/Level_3/hark-the-herald-angels-sing-piano.pdf",
+      "pdf_url": "https://makingmusicfun.net/pdf/sheet_music/hark-the-herald-angels-sing-piano.pdf",
+      "entry_time": "2022-04-14 16:07:04.000"
+    },
+    {
+      "entry_id": 37,
+      "title": "Pathetique Sonata",
+      "url": "https://makingmusicfun.net/htm/f_printit_free_printable_sheet_music/pathetique-sonata-piano.php",
+      "category": "Beethoven",
+      "level": "Level 5",
+      "pdf_file": "pdf_files/Level_5/pathetique-sonata-piano.pdf",
+      "pdf_url": "https://makingmusicfun.net/pdf/sheet_music/pathetique-sonata-piano.pdf",
+      "entry_time": "2022-04-14 16:07:04.000"
+    },
+    {
+      "entry_id": 42,
+      "title": "Twelve Days of Christmas",
+      "url": "https://makingmusicfun.net/htm/f_printit_free_printable_sheet_music/twelve-days-of-christmas-piano.php",
+      "category": "Christmas",
+      "level": "Level 3",
+      "pdf_file": "pdf_files/Level_3/twelve-days-of-christmas-piano.pdf",
+      "pdf_url": "https://makingmusicfun.net/pdf/sheet_music/twelve-days-of-christmas-piano.pdf",
+      "entry_time": "2022-04-14 16:07:05.000"
+    },
+    {
+      "entry_id": 44,
+      "title": "Up on the Housetop",
+      "url": "https://makingmusicfun.net/htm/f_printit_free_printable_sheet_music/up-on-the-housetop-piano.php",
+      "category": "Christmas",
+      "level": "Level 3",
+      "pdf_file": "pdf_files/Level_3/up-on-the-housetop-piano.pdf",
+      "pdf_url": "https://makingmusicfun.net/pdf/sheet_music/up-on-the-housetop-piano.pdf",
+      "entry_time": "2022-04-14 16:07:05.000"
+    },
+    {
+      "entry_id": 49,
+      "title": "Jolly Old Saint Nicholas",
+      "url": "https://makingmusicfun.net/htm/f_printit_free_printable_sheet_music/jolly-old-saint-nicholas-piano-solo.php",
+      "category": "Christmas",
+      "level": "Level 1",
+      "pdf_file": "pdf_files/Level_1/jolly-old-saint-nicholas-piano-solo.pdf",
+      "pdf_url": "https://makingmusicfun.net/pdf/sheet_music/jolly-old-saint-nicholas-piano-solo.pdf",
+      "entry_time": "2022-04-14 16:07:05.000"
+    },
+    {
+      "entry_id": 51,
+      "title": "Away in a Manger",
+      "url": "https://makingmusicfun.net/htm/f_printit_free_printable_sheet_music/away-in-a-manger-piano-solo.php",
+      "category": "Christmas",
+      "level": "Level 3",
+      "pdf_file": "pdf_files/Level_3/away-in-a-manger-piano-solo.pdf",
+      "pdf_url": "https://makingmusicfun.net/pdf/sheet_music/away-in-a-manger-piano-solo.pdf",
+      "entry_time": "2022-04-14 16:07:05.000"
+    },
+    {
+      "entry_id": 52,
+      "title": "Angels We Have Heard On High",
+      "url": "https://makingmusicfun.net/htm/f_printit_free_printable_sheet_music/angels-we-have-heard-on-high-piano.php",
+      "category": "Christmas",
+      "level": "Level 3",
+      "pdf_file": "pdf_files/Level_3/angels-we-have-heard-on-high-piano.pdf",
+      "pdf_url": "https://makingmusicfun.net/pdf/sheet_music/angels-we-have-heard-on-high-piano.pdf",
+      "entry_time": "2022-04-14 16:07:05.000"
+    },
+    {
+      "entry_id": 53,
+      "title": "God Rest Ye Merry, Gentlemen",
+      "url": "https://makingmusicfun.net/htm/f_printit_free_printable_sheet_music/god-rest-ye-merry-gentlemen-piano.php",
+      "category": "Christmas",
+      "level": "Level 3",
+      "pdf_file": "pdf_files/Level_3/god-rest-ye-merry-gentlemen-piano.pdf",
+      "pdf_url": "https://makingmusicfun.net/pdf/sheet_music/god-rest-ye-merry-gentlemen-piano.pdf",
+      "entry_time": "2022-04-14 16:07:05.000"
+    },
+    {
+      "entry_id": 55,
+      "title": "The Holly and the Ivy",
+      "url": "https://makingmusicfun.net/htm/f_printit_free_printable_sheet_music/holly-and-the-ivy-intermediate-piano.php",
+      "category": "Christmas",
+      "level": "Level 3",
+      "pdf_file": "pdf_files/Level_3/holly-and-the-ivy-piano-solo.pdf",
+      "pdf_url": "https://makingmusicfun.net/pdf/sheet_music/holly-and-the-ivy-piano-solo.pdf",
+      "entry_time": "2022-04-14 16:07:05.000"
+    },
+    {
+      "entry_id": 59,
+      "title": "Pat-a-Pan (Monnoye)",
+      "url": "https://makingmusicfun.net/htm/f_printit_free_printable_sheet_music/pat-a-pan-piano.php",
+      "category": "Christmas",
+      "level": "Level 2",
+      "pdf_file": "pdf_files/Level_2/pat-a-pan-piano.pdf",
+      "pdf_url": "https://makingmusicfun.net/pdf/sheet_music/pat-a-pan-piano.pdf",
+      "entry_time": "2022-04-14 16:07:05.000"
+    },
+    {
+      "entry_id": 63,
+      "title": "The First No\u00ebl",
+      "url": "https://makingmusicfun.net/htm/f_printit_free_printable_sheet_music/the-first-noel-piano.php",
+      "category": "Christmas",
+      "level": "Level 1",
+      "pdf_file": "pdf_files/Level_1/the-first-noel-piano.pdf",
+      "pdf_url": "https://makingmusicfun.net/pdf/sheet_music/the-first-noel-piano.pdf",
+      "entry_time": "2022-04-14 16:07:05.000"
+    },
+    {
+      "entry_id": 69,
+      "title": "Ding Dong Merrily On High",
+      "url": "https://makingmusicfun.net/htm/f_printit_free_printable_sheet_music/ding-dong-merrily-on-high-piano.php",
+      "category": "Christmas",
+      "level": "Level 3",
+      "pdf_file": "pdf_files/Level_3/ding-dong-merrily-on-high-piano.pdf",
+      "pdf_url": "https://makingmusicfun.net/pdf/sheet_music/ding-dong-merrily-on-high-piano.pdf",
+      "entry_time": "2022-04-14 16:07:05.000"
+    },
+    {
+      "entry_id": 70,
+      "title": "Turkish March",
+      "url": "https://makingmusicfun.net/htm/f_printit_free_printable_sheet_music/turkish-march-beethoven-piano.php",
+      "category": "Beethoven",
+      "level": "Level 2",
+      "pdf_file": "pdf_files/Level_2/turkish-march-beethoven-piano.pdf",
+      "pdf_url": "https://makingmusicfun.net/pdf/sheet_music/turkish-march-beethoven-piano.pdf",
+      "entry_time": "2022-04-14 16:07:05.000"
+    },
+    {
+      "entry_id": 71,
+      "title": "Coventry Carol",
+      "url": "https://makingmusicfun.net/htm/f_printit_free_printable_sheet_music/coventry-carol-piano.php",
+      "category": "Christmas",
+      "level": "Level 3",
+      "pdf_file": "pdf_files/Level_3/coventry-carol-piano.pdf",
+      "pdf_url": "https://makingmusicfun.net/pdf/sheet_music/coventry-carol-piano.pdf",
+      "entry_time": "2022-04-14 16:07:05.000"
+    },
+    {
+      "entry_id": 80,
+      "title": "Russian Folk Song, Op. 107, No. 3",
+      "url": "https://makingmusicfun.net/htm/f_printit_free_printable_sheet_music/russian-folksong-piano.php",
+      "category": "Beethoven",
+      "level": "Level 3",
+      "pdf_file": "pdf_files/Level_3/russian-folksong-piano.pdf",
+      "pdf_url": "https://makingmusicfun.net/pdf/sheet_music/russian-folksong-piano.pdf",
+      "entry_time": "2022-04-14 16:07:05.000"
+    },
+    {
+      "entry_id": 87,
+      "title": "Here We Come A-Wassailing (English)",
+      "url": "https://makingmusicfun.net/htm/f_printit_free_printable_sheet_music/here-we-come-a-wassailing-piano.php",
+      "category": "Christmas",
+      "level": "Level 4",
+      "pdf_file": "pdf_files/Level_4/here-we-come-a-wassailing-piano.pdf",
+      "pdf_url": "https://makingmusicfun.net/pdf/sheet_music/here-we-come-a-wassailing-piano.pdf",
+      "entry_time": "2022-04-14 16:07:05.000"
+    },
+    {
+      "entry_id": 101,
+      "title": "Christ Was Born on Christmas Day",
+      "url": "https://makingmusicfun.net/htm/f_printit_free_printable_sheet_music/christ-was-born-on-christmas-day-piano.php",
+      "category": "Christmas",
+      "level": "Level 2",
+      "pdf_file": "pdf_files/Level_2/christ-was-born-on-christmas-day-piano.pdf",
+      "pdf_url": "https://makingmusicfun.net/pdf/sheet_music/christ-was-born-on-christmas-day-piano.pdf",
+      "entry_time": "2022-04-14 16:07:05.000"
+    },
+    {
+      "entry_id": 107,
+      "title": " O Come, Little Children",
+      "url": "https://makingmusicfun.net/htm/f_printit_free_printable_sheet_music/o-come-little-children-piano.php",
+      "category": "Christmas",
+      "level": "Level 3",
+      "pdf_file": "pdf_files/Level_3/o-come-little-children-piano.pdf",
+      "pdf_url": "https://makingmusicfun.net/pdf/sheet_music/o-come-little-children-piano.pdf",
+      "entry_time": "2022-04-14 16:07:05.000"
+    },
+    {
+      "entry_id": 108,
+      "title": "He is Born, the Divine Christ Child",
+      "url": "https://makingmusicfun.net/htm/f_printit_free_printable_sheet_music/he-is-born-the-divine-christ-child-piano-duet.php",
+      "category": "Christmas",
+      "level": "Level 5",
+      "pdf_file": "pdf_files/Level_5/he-is-born-the-divine-christ-child-piano-duet.pdf",
+      "pdf_url": "https://makingmusicfun.net/pdf/sheet_music/he-is-born-the-divine-christ-child-piano-duet.pdf",
+      "entry_time": "2022-04-14 16:07:05.000"
+    },
+    {
+      "entry_id": 125,
+      "title": "Coventry Carol",
+      "url": "https://makingmusicfun.net/htm/f_printit_free_printable_sheet_music/coventry-carol-beginner-piano.php",
+      "category": "Christmas",
+      "level": "Level 1",
+      "pdf_file": "pdf_files/Level_1/coventry-carol-beginner-piano.pdf",
+      "pdf_url": "https://makingmusicfun.net/pdf/sheet_music/coventry-carol-beginner-piano.pdf",
+      "entry_time": "2022-04-14 16:07:05.000"
+    },
+    {
+      "entry_id": 129,
+      "title": "Ecossaise",
+      "url": "https://makingmusicfun.net/htm/f_printit_free_printable_sheet_music/ecossaise-piano-solo.php",
+      "category": "Beethoven",
+      "level": "Level 5",
+      "pdf_file": "pdf_files/Level_5/ecossaise-for-piano-solo.pdf",
+      "pdf_url": "https://makingmusicfun.net/pdf/sheet_music/ecossaise-for-piano-solo.pdf",
+      "entry_time": "2022-04-14 16:07:05.000"
+    },
+    {
+      "entry_id": 142,
+      "title": "Adeste Fideles (O Come All Ye Faithful)",
+      "url": "https://makingmusicfun.net/htm/f_printit_free_printable_sheet_music/adeste-fideles-piano-solo.php",
+      "category": "Christmas",
+      "level": "Level 3",
+      "pdf_file": "pdf_files/Level_3/o-come-all-ye-faithful-piano-solo.pdf",
+      "pdf_url": "https://makingmusicfun.net/pdf/sheet_music/o-come-all-ye-faithful-piano-solo.pdf",
+      "entry_time": "2022-04-14 16:07:05.000"
+    },
+    {
+      "entry_id": 154,
+      "title": "Bring a Torch, Jeanette, Isabella",
+      "url": "https://makingmusicfun.net/htm/f_printit_free_printable_sheet_music/jeannette-isabella-jazz-piano-solo.php",
+      "category": "Christmas",
+      "level": "Level 4",
+      "pdf_file": "pdf_files/Level_4/jeannette-isabella-jazz-piano.pdf",
+      "pdf_url": "https://makingmusicfun.net/pdf/sheet_music/jeannette-isabella-jazz-piano.pdf",
+      "entry_time": "2022-04-14 16:07:05.000"
+    },
+    {
+      "entry_id": 158,
+      "title": "Minuet in G (Music Man)",
+      "url": "https://makingmusicfun.net/htm/f_printit_free_printable_sheet_music/beethoven-minuet-piano.php",
+      "category": "Beethoven",
+      "level": "Level 4",
+      "pdf_file": "pdf_files/Level_4/beethoven-minuet-piano.pdf",
+      "pdf_url": "https://makingmusicfun.net/pdf/sheet_music/beethoven-minuet-piano.pdf",
+      "entry_time": "2022-04-14 16:07:05.000"
+    },
+    {
+      "entry_id": 160,
+      "title": "It Came Upon a Midnight Clear",
+      "url": "https://makingmusicfun.net/htm/f_printit_free_printable_sheet_music/it-came-upon-a-midnight-clear-piano.php",
+      "category": "Christmas",
+      "level": "Level 4",
+      "pdf_file": "pdf_files/Level_4/it-came-upon-a-midnight-clear-piano.pdf",
+      "pdf_url": "https://makingmusicfun.net/pdf/sheet_music/it-came-upon-a-midnight-clear-piano.pdf",
+      "entry_time": "2022-04-14 16:07:05.000"
+    },
+    {
+      "entry_id": 163,
+      "title": "Russian Folk Song, Op. 107, No. 7",
+      "url": "https://makingmusicfun.net/htm/f_printit_free_printable_sheet_music/russian-folk-song-no7-piano.php",
+      "category": "Beethoven",
+      "level": "Level 3",
+      "pdf_file": "pdf_files/Level_3/russian-folk-song-no7-piano.pdf",
+      "pdf_url": "https://makingmusicfun.net/pdf/sheet_music/russian-folk-song-no7-piano.pdf",
+      "entry_time": "2022-04-14 16:07:05.000"
+    },
+    {
+      "entry_id": 199,
+      "title": "Bring a Torch, Jeanette, Isabella",
+      "url": "https://makingmusicfun.net/htm/f_printit_free_printable_sheet_music/jeannette-isabella-piano-solo.php",
+      "category": "Christmas",
+      "level": "Level 4",
+      "pdf_file": "pdf_files/Level_4/jeannette-isabella-piano-solo.pdf",
+      "pdf_url": "https://makingmusicfun.net/pdf/sheet_music/jeannette-isabella-piano-solo.pdf",
+      "entry_time": "2022-04-14 16:07:05.000"
+    },
+    {
+      "entry_id": 208,
+      "title": "Rage Over a Lost Penny",
+      "url": "https://makingmusicfun.net/htm/f_printit_free_printable_sheet_music/rage-over-a-lost-penny-piano.php",
+      "category": "Beethoven",
+      "level": "Level 5",
+      "pdf_file": "pdf_files/Level_5/rage-over-a-lost-penny-piano.pdf",
+      "pdf_url": "https://makingmusicfun.net/pdf/sheet_music/rage-over-a-lost-penny-piano.pdf",
+      "entry_time": "2022-04-14 16:07:05.000"
+    }
+  ]
+}
+cookie_info = ('user_id', '11')
+{
+  "query": "SELECT * FROM mmf WHERE entry_id = ?;"
+}
+{
+  "values": [
+    "15"
+  ]
+}
+{
+  "query": "INSERT INTO files (user_id,title,file_name,level,category,entry_time) VALUES (?, ?, ?, ?, ?, ?);"
+}
+{
+  "col_values": [
+    "11",
+    "O Christmas Tree",
+    "o-christmas-tree-piano-solo.pdf",
+    "Level 4",
+    "Christmas",
+    "2022-05-24 12:44:59.521780"
+  ]
+}
+127.0.0.1 2022-05-24 12:44:59.520436 POST http://127.0.0.1:8380/downloadFile 200 OK
+{
+  "request.params": {
+    "entry_id": 15,
+    "token": "IUVEN3ZKUk1yZmdwUmMrSUNXelhUQmc9PT9nQVdWRWdBQUFBQUFBQUNNQjNWelpYSmZhV1NVakFJeE1aU0dsQzQ9",
+    "webapp": false
+  }
+}
+{
+  "message": "file downloaded",
+  "mmf_entry_id": "15",
+  "entry_id": "34"
+}
+cookie_info = ('user_id', '11')
+{
+  "query": "SELECT * FROM files WHERE user_id=?;"
+}
+{
+  "values": [
+    "11"
+  ]
+}
+127.0.0.1 2022-05-24 12:45:03.847322 GET http://127.0.0.1:8380/dashboard?token=IUVEN3ZKUk1yZmdwUmMrSUNXelhUQmc9PT9nQVdWRWdBQUFBQUFBQUNNQjNWelpYSmZhV1NVakFJeE1aU0dsQzQ9 200 OK
+{
+  "request.params": {
+    "token": "IUVEN3ZKUk1yZmdwUmMrSUNXelhUQmc9PT9nQVdWRWdBQUFBQUFBQUNNQjNWelpYSmZhV1NVakFJeE1aU0dsQzQ9",
+    "webapp": false
+  }
+}
+{
+  "message": "user_dashboard",
+  "files": [
+    {
+      "entry_id": 22,
+      "user_id": 11,
+      "title": "F\u00fcr Elise",
+      "level": "Level 3",
+      "category": "Beethoven",
+      "file_name": "fur_elise_piano.pdf",
+      "entry_time": "2022-05-11 14:03:33.584639"
+    },
+    {
+      "entry_id": 24,
+      "user_id": 11,
+      "title": "Pathetique Sonata",
+      "level": "Level 5",
+      "category": "Beethoven",
+      "file_name": "pathetique-sonata-piano.pdf",
+      "entry_time": "2022-05-11 14:25:23.491977"
+    },
+    {
+      "entry_id": 25,
+      "user_id": 11,
+      "title": "Good King Wenceslas",
+      "level": "Level 1",
+      "category": "Christmas",
+      "file_name": "good-king-wenceslas-piano-solo.pdf",
+      "entry_time": "2022-05-11 16:11:46.802140"
+    },
+    {
+      "entry_id": 28,
+      "user_id": 11,
+      "title": "Brother John",
+      "level": "Level 1",
+      "category": "Nursery Rhyme",
+      "file_name": "brother-john-piano.pdf",
+      "entry_time": "2022-05-12 07:43:17.249671"
+    },
+    {
+      "entry_id": 34,
+      "user_id": 11,
+      "title": "O Christmas Tree",
+      "level": "Level 4",
+      "category": "Christmas",
+      "file_name": "o-christmas-tree-piano-solo.pdf",
+      "entry_time": "2022-05-24 12:44:59.521780"
+    }
+  ]
+}
+cookie_info = ('user_id', '11')
+{
+  "query": "SELECT * FROM files WHERE user_id=? AND entry_id=?;"
+}
+{
+  "values": [
+    "11",
+    "24"
+  ]
+}
+127.0.0.1 2022-05-24 12:45:10.381172 POST http://127.0.0.1:8380/processFile 200 OK
+{
+  "request.params": {
+    "entry_id": 24,
+    "token": "IUVEN3ZKUk1yZmdwUmMrSUNXelhUQmc9PT9nQVdWRWdBQUFBQUFBQUNNQjNWelpYSmZhV1NVakFJeE1aU0dsQzQ9",
+    "webapp": false
+  }
+}
+{
+  "message": "processing file",
+  "file": "/home/katayama/Documents/pianists/pdf_files/11/pathetique-sonata-piano.pdf"
+}

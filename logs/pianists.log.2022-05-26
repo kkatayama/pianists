@@ -1,0 +1,33 @@
+127.0.0.1 2022-05-26 10:27:50.603289 GET http://127.0.0.1:8380/getINI 200 OK
+{"request.params": {"webapp": false}}
+[server]
+ip = sokotaro.hopto.org
+port = 42286
+username = katayama
+
+[macbook]
+ip = localhost
+port = 2222
+username = nick-kater
+remote_path = /Users/nick-kater/incoming
+temp_path = /Users/nick-kater/ml_processing
+
+[pi]
+ip = localhost
+port = 2323
+username = pi
+remote_path = /home/pi/incoming
+temp_path = /home/pi/pcode_processing
+
+
+127.0.0.1 2022-05-26 10:27:50.723523 POST http://127.0.0.1:8380/addKey?key=ssh-rsa+AAAAB3NzaC1yc2EAAAADAQABAAABgQCxEdzzB7nEdRaBRTtAmpyremg%2B0wmBGOAHos06crMrUVIDrRHMbuQwI%2FeIkooU1y5fUKO%2FoRPr4dl5h1cPKUcP5M5u%2F80oIysE70pN7ILs2kEV3FtT0iz2zOY1XNlb89VAGR%2B7PFGx19jL2W83m8vRbJnLMjy%2BQt2uZ25J1Kmm3RJRS8mTi93UaejDYAeFHyLO%2FKlVfdPcMmba%2BxLp%2B5fQCZs7%2FCazmGdQm2skQ5gqzHK4GSoVM4squMlAabS%2F1vpIjGEM1AMtiImBj7XEACrrmmQTxQZTlQPetVMx9TP%2B63QSvV4koxZy3fAjcaXRxXvKqvYZXZZgrYowAThFXrMHc4eTOVU4q8x8pDDDC16medppC%2F5l3KO9%2Bva3mDu7UCDds7k2ziOt5L85KuDHB1N5bq2nqEe9PPIrQAFlxJSUHQjwsfsxRDdmugbYxp7nwT%2BsAc%2FG1aDVeMF%2Fxk59%2BIe9YSNAwNZySHKjZBJAgq2ACEpJ9rqrM5XiSrMhg1q4iAU%3D+katayama%40gizmo 200 OK
+{
+  "request.params": {
+    "key": "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCxEdzzB7nEdRaBRTtAmpyremg+0wmBGOAHos06crMrUVIDrRHMbuQwI/eIkooU1y5fUKO/oRPr4dl5h1cPKUcP5M5u/80oIysE70pN7ILs2kEV3FtT0iz2zOY1XNlb89VAGR+7PFGx19jL2W83m8vRbJnLMjy+Qt2uZ25J1Kmm3RJRS8mTi93UaejDYAeFHyLO/KlVfdPcMmba+xLp+5fQCZs7/CazmGdQm2skQ5gqzHK4GSoVM4squMlAabS/1vpIjGEM1AMtiImBj7XEACrrmmQTxQZTlQPetVMx9TP+63QSvV4koxZy3fAjcaXRxXvKqvYZXZZgrYowAThFXrMHc4eTOVU4q8x8pDDDC16medppC/5l3KO9+va3mDu7UCDds7k2ziOt5L85KuDHB1N5bq2nqEe9PPIrQAFlxJSUHQjwsfsxRDdmugbYxp7nwT+sAc/G1aDVeMF/xk59+Ie9YSNAwNZySHKjZBJAgq2ACEpJ9rqrM5XiSrMhg1q4iAU= katayama@gizmo",
+    "webapp": false
+  }
+}
+{
+  "status": "exists",
+  "key": "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDzikz9C+R1WlCAeGYxTusK/LZQvxm6Vgi7bwOVLWYlIkRwWpyFx3eK1HfJFk3fasUj/dw0OHfgN3ROxbBkL8BRZfmss6PHAq1fAUdzTmRigjsipxorYsu8trxfOlZCErAgwiDgXvH5kSVP0INwJHjdFANqqPJTf+SMIxfx0eXQ8kPxmqp6aGMsm5z5UzHd1i+51QWqpy1w/CaJg3apL1N1y4O3Jr+NuyPqqgi55TYJa5TSjbGxdRylcTmohIO7cKd7TdcNt4Y673oO+lmm/Bl/2VrFHOvkRVS+hnQUY8q9miqbwKv29eu4R6Ch1W4chdnAwKxckulTlYu9B2EBTF19 katayama@mal"
+}
